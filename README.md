@@ -16,7 +16,7 @@ work_logs/
 │   ├── index.html    # single-page UI
 │   ├── style.css
 │   └── app.js
-├── .env              # AWS_BEARER_TOKEN_BEDROCK lives here (gitignored)
+├── .env              # AI API lives here (gitignored)
 └── logbook/          # Obsidian vault — all generated notes land here
     ├── daily/
     ├── weekly/
