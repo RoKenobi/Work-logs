@@ -25,18 +25,13 @@ work_logs/
     └── final_report.md
 ```
 
-## Setup
 
-```bash
-pip install flask rich anthropic pyyaml
 ```
 
 Create `.env` in the repo root:
 
 ```
-AWS_BEARER_TOKEN_BEDROCK="your_token"
-AWS_REGION=us-east-1
-ANTHROPIC_DEFAULT_SONNET_MODEL=us.anthropic.claude-sonnet-4-5-20250929-v1:0
+API KEY 
 ```
 
 ## Run
@@ -73,7 +68,7 @@ Every save shows a preview first — edit before it lands in the vault.
   `###` headings in the generated entry.
 
 Question count is **adaptive** — there are no fixed quotas. If the brain dump
-is short or says "nothing happened today", Claude asks 0–1 questions and stops.
+is short or says "nothing happened today", AI will asks 0–1 questions and stops.
 
 ## Token notes
 
