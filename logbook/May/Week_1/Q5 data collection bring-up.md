@@ -10,7 +10,7 @@ aliases:
 
 **Graph Nodes:** [[RobotEra Q5]] · #ROS2 #MultithreadedExecutor #V4L2 #DeadReckoning
 
-**Theme:** [[Robotics Middleware Infrastructure]] (3 shared)
+**Theme:** [[ROS 2 Robotics Middleware]] (4 shared)
 
 ### Tasks Completed
 - Successfully captured first synchronized dataset from RobotEra Q5 robot after resolving non-standard ROS2 topic discovery

@@ -10,7 +10,7 @@ aliases:
 
 **Graph Nodes:** [[Agibot A2 Ultra]], [[GMSL Camera]], [[Praxis Platform]], [[Praxis Agents]], [[AIMDK]] · #ROS2 #Python #FFmpeg #OpenCV #MediaMTX #MQTT #DDS #V4L2 #H264 #QoS #MockMode #VendorAbstraction
 
-**Theme:** [[Praxis Integration Toolchain]] (10 shared) · [[Robotics Middleware Infrastructure]] (7 shared)
+**Theme:** [[ROS 2 Robotics Middleware]] (8 shared) · [[Video Streaming Infrastructure]] (5 shared) · [[Robotics Integration Infrastructure]] (4 shared)
 
 ### Summary
 Closed out the A2 sensor-side bring-up: BMS health publisher with unit-normalisation and fault-code mapping, 7-DoF arm joint-state republisher with explicit `BEST_EFFORT` QoS to match the vendor publisher, and 1920×1536 V4L2 video streamer from the GMSL interaction camera. End-to-end demo with the cloud-side `concierge_agent` driving "wave hello and walk 2 m forward" as a single natural-language instruction routed through Praxis.

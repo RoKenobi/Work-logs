@@ -10,7 +10,7 @@ aliases:
 
 **Graph Nodes:** [[RobotEra Q5]], [[Praxis Platform]] · #CycloneDDS #DDS #ROS2 #FSMOrchestration #ROSService #VendorAbstraction
 
-**Theme:** [[Robot Middleware Integration]] (4 shared)
+**Theme:** [[ROS 2 Robotics Middleware]] (5 shared) · [[Robotics Integration Infrastructure]] (3 shared)
 
 ### Summary
 Started the RobotEra Q5 humanoid driver and tracked down two distinct "publishes but doesn't move" classes of bug back-to-back — the Q5's strict `INIT → IDLE → READY → ACTIVE` FSM must be advanced via service calls before any `cmd_vel` takes effect, and the host had `RMW_IMPLEMENTATION` defaulting to FastDDS while the Q5 publishes via CycloneDDS, leaving the topic discovery completely empty. Both fixed; the driver now talks to the robot end-to-end.

@@ -1,5 +1,6 @@
 ---
 aliases:
+  - Weekly_W4
   - 2026-W24
 ---
 
@@ -9,7 +10,7 @@ aliases:
 
 **Graph Nodes:** [[Agibot A2 Ultra]], [[Praxis Platform]], [[AIMDK]], [[GMSL Camera]], [[Jetson Orin]] · #ROS2 #systemd #Python #DDS #MQTT #JSONRPC #tmuxinator #colcon #QoS #SE2Composition #DeadReckoning #MultithreadedExecutor #VendorAbstraction
 
-**Theme:** [[Robotics Middleware Infrastructure]] (14 shared) · [[Praxis Integration Toolchain]] (4 shared)
+**Theme:** [[ROS 2 Robotics Middleware]] (14 shared) · [[Robotics Integration Infrastructure]] (4 shared)
 
 ### Summary
 Shipped the Agibot A2 Ultra end-to-end into Praxis: a six-node ROS 2 driver atop a four-unit `systemd`-managed on-board service substrate, the second-ever discrete-dead-reckoning executor pattern in the fleet, and a deployment workflow that reaches `READY` status against the `@assess-integration` agent. Closed the week with a conversational demo — `concierge_agent` decomposed "wave hello and walk 2 m forward" into a `motion_replay` action followed by a `navigate_to_pose` with feedback streamed back over MQTT.

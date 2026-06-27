@@ -10,7 +10,7 @@ aliases:
 
 **Graph Nodes:** [[Unitree Go2]], [[Praxis Platform]], [[Praxis SDK]] · #GoogleADK #MQTT #RTSP #Pydantic #AWSBedrock #Docker #tmuxinator #VendorAbstraction #ROSTopic
 
-**Theme:** [[Praxis Integration Toolchain]] (11 shared)
+**Theme:** [[Robotics Integration Infrastructure]] (10 shared)
 
 ### Tasks Completed
 - Achieved successful end-to-end integration demonstration of Unitree Go2 with Praxis multi-robot platform

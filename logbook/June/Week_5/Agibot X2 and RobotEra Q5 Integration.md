@@ -1,5 +1,6 @@
 ---
 aliases:
+  - Weekly_W5
   - 2026-W25
 ---
 
@@ -9,7 +10,7 @@ aliases:
 
 **Graph Nodes:** [[Agibot X2 Ultra]], [[RobotEra Q5]], [[Unitree Go2]], [[Agibot A2 Ultra]], [[Praxis Platform]], [[AIMDK]] · #ROS2 #CycloneDDS #DDS #FFmpeg #OpenCV #colcon #tmuxinator #HTTP #V4L2 #SE2Composition #DeadReckoning #MultisourceArbitration #FSMOrchestration #MultithreadedExecutor #SettleDetection #TwophaseTranslateRotate #QoS
 
-**Theme:** [[Robotics Middleware Infrastructure]] (9 shared) · [[Robot Middleware Integration]] (9 shared) · [[Praxis Integration Toolchain]] (5 shared)
+**Theme:** [[ROS 2 Robotics Middleware]] (17 shared) · [[Robotics Integration Infrastructure]] (4 shared)
 
 ### Summary
 Shipped two complete humanoid integrations end-to-end: Agibot X2 Ultra (bipedal, IMU-fused dead-reckoning, multi-source arbitration, TTS) Mon-Wed, and RobotEra Q5 (60 V 70 kg wheeled humanoid, FSM-orchestrated, settle-detected motion replay) Wed-Fri. The fleet now has three architecturally-distinct pose-estimation strategies — vendor odom (Go2), discrete RPC (A2), IMU+commanded velocity (X2), and Q5 odom delta integration — all under one Praxis `set_pose` / `navigate_to_pose` schema. Cloud-side `concierge_agent` drove a guided-tour sequence on the Q5 by week's end without any Q5-specific code on the agent side.

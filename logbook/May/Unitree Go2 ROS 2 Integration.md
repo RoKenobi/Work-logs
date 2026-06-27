@@ -1,5 +1,6 @@
 ---
 aliases:
+  - Biweekly_W1-W2
   - 2026-W26
 ---
 
