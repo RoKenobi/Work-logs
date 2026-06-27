@@ -1,0 +1,408 @@
+# Canonical entity registry for work-logs graph view.
+#
+# `kind`:
+#   hardware  — physical robots, dev boards, sensors. Rendered as [[Wikilinks]].
+#               A stub file is auto-created in logbook/entities/<name>.md so
+#               the wikilink resolves to a real graph node.
+#   platform  — orchestration platforms, fleet managers, dashboards. Same as
+#               hardware (wikilinked + stub).
+#   software  — languages, runtimes, libraries. Rendered as #tags.
+#   protocol  — wire/transport protocols, RPC standards. Rendered as #tags.
+#   concept   — abstract patterns, algorithms, design ideas. Rendered as #tags.
+#
+# `aliases` — alternate spellings the LLM might emit; matched
+# case-insensitively. New entities proposed by the classifier are appended
+# here only after user approval.
+
+entities:
+- name: Unitree Go2
+  kind: hardware
+  aliases:
+  - Go2
+  - Unitree Quadruped
+  description: Quadruped robot (Edu/Pro variant)
+  parent: Unitree
+- name: Agibot A2 Ultra
+  kind: hardware
+  aliases:
+  - A2
+  - A2 Ultra
+  - Agibot A2
+  description: Life-sized humanoid, "Ultra" SKU
+  parent: Agibot
+- name: Agibot X2 Ultra
+  kind: hardware
+  aliases:
+  - X2
+  - X2 Ultra
+  - Agibot X2
+  description: Bipedal humanoid with full-body joints, hands, screen
+  parent: Agibot
+- name: Agibot D1 Max
+  kind: hardware
+  aliases:
+  - D1
+  - D1 Max
+  description: Agibot D1 humanoid (Max SKU)
+  parent: Agibot
+- name: RobotEra Q5
+  kind: hardware
+  aliases:
+  - Q5
+  - RobotEra Q5 Pro
+  description: 60 V wheeled-base humanoid, 34 DoF, dexterous hands
+  parent: RobotEra
+- name: Jetson Orin
+  kind: hardware
+  aliases:
+  - Orin
+  - NVIDIA Orin
+  - Jetson
+  description: On-robot edge compute
+- name: Arduino
+  kind: hardware
+  aliases: []
+  description: USB-serial bridge for strobe / aux IO
+- name: GMSL Camera
+  kind: hardware
+  aliases:
+  - gmslcam6
+  - /dev/gmslcam6
+  description: MIPI GMSL interaction camera (A2)
+- name: Praxis Platform
+  kind: platform
+  aliases:
+  - Praxis
+  - praxis
+  - Praxis Robotics Platform
+  description: Multi-robot orchestration platform
+- name: Praxis SDK
+  kind: platform
+  aliases:
+  - praxis_sdk
+  - PraxisClient
+  description: Python SDK; publishers, executors, JWT, spatial helpers
+  parent: Praxis Platform
+- name: Praxis Agents
+  kind: platform
+  aliases:
+  - praxis_agents
+  - robot_agent
+  - concierge_agent
+  description: ADK/Bedrock LLM agent service
+  parent: Praxis Platform
+- name: AIMDK
+  kind: platform
+  aliases:
+  - aimdk
+  - AIMDK runtime
+  - AIMDK SDK
+  description: Agibot on-robot runtime + JSON-RPC surface
+  parent: Agibot
+- name: XOS Runtime
+  kind: platform
+  aliases:
+  - XOS
+  - RobotEra XOS
+  description: Q5 internal HTTP runtime (port 1888)
+  parent: RobotEra
+- name: ROS 2
+  kind: software
+  aliases:
+  - ROS2
+  - ROS
+  - rclpy
+  - ros2
+  description: Robot Operating System v2
+- name: Python
+  kind: software
+  aliases:
+  - python
+  - python3
+  description: ''
+- name: FFmpeg
+  kind: software
+  aliases:
+  - ffmpeg
+  - libx264
+  description: ''
+- name: OpenCV
+  kind: software
+  aliases:
+  - opencv
+  - cv2
+  - cv_bridge
+  description: ''
+- name: GStreamer
+  kind: software
+  aliases:
+  - gstreamer
+  - gst
+  description: ''
+- name: Docker
+  kind: software
+  aliases:
+  - docker
+  - Docker Compose
+  - docker compose
+  description: ''
+- name: tmuxinator
+  kind: software
+  aliases:
+  - tmux
+  - tmuxinator profile
+  description: ''
+- name: systemd
+  kind: software
+  aliases:
+  - systemd unit
+  description: ''
+- name: colcon
+  kind: software
+  aliases:
+  - colcon build
+  description: ''
+  parent: ROS 2
+- name: MediaMTX
+  kind: software
+  aliases:
+  - mediamtx
+  description: RTSP server
+- name: VerneMQ
+  kind: software
+  aliases:
+  - vernemq
+  - vernemq broker
+  description: MQTT broker
+- name: Google ADK
+  kind: software
+  aliases:
+  - ADK
+  - Agent Development Kit
+  description: ''
+- name: AWS Bedrock
+  kind: software
+  aliases:
+  - Bedrock
+  - bedrock
+  description: ''
+- name: Pydantic
+  kind: software
+  aliases:
+  - pydantic
+  description: ''
+- name: NumPy
+  kind: software
+  aliases:
+  - numpy
+  description: ''
+- name: Flask
+  kind: software
+  aliases:
+  - flask
+  description: ''
+- name: MQTT
+  kind: protocol
+  aliases:
+  - mqtt
+  description: ''
+- name: DDS
+  kind: protocol
+  aliases:
+  - FastDDS
+  - FastRTPS
+  - fastdds
+  description: ''
+- name: CycloneDDS
+  kind: protocol
+  aliases:
+  - cyclonedds
+  - rmw_cyclonedds_cpp
+  description: ''
+  parent: DDS
+- name: RTSP
+  kind: protocol
+  aliases:
+  - rtsp
+  description: ''
+- name: HTTP
+  kind: protocol
+  aliases:
+  - REST
+  - HTTP/JSON-RPC
+  description: ''
+- name: JSON-RPC
+  kind: protocol
+  aliases:
+  - json-rpc
+  - jsonrpc
+  description: ''
+- name: JWT
+  kind: protocol
+  aliases:
+  - jwt
+  - JSON Web Token
+  description: ''
+- name: H.264
+  kind: protocol
+  aliases:
+  - h264
+  - H264
+  - libx264
+  description: ''
+- name: V4L2
+  kind: protocol
+  aliases:
+  - v4l2
+  - Video4Linux
+  description: ''
+- name: ALSA
+  kind: protocol
+  aliases:
+  - alsa
+  description: ''
+- name: IGMP
+  kind: protocol
+  aliases:
+  - multicast
+  - IGMP multicast
+  description: ''
+- name: ROS Topic
+  kind: protocol
+  aliases:
+  - topic
+  - pub-sub
+  description: ''
+  parent: ROS 2
+- name: ROS Service
+  kind: protocol
+  aliases:
+  - service
+  - srv
+  description: ''
+  parent: ROS 2
+- name: ROS Action
+  kind: protocol
+  aliases:
+  - action
+  - action server
+  description: ''
+  parent: ROS 2
+- name: SE(2) Composition
+  kind: concept
+  aliases:
+  - SE(2)
+  - SE2
+  - Lie group composition
+  - frame composition
+  description: ''
+  parent: Dead Reckoning
+- name: Dead Reckoning
+  kind: concept
+  aliases:
+  - dead-reckoning
+  - dead reckoning
+  - odometry integration
+  description: ''
+- name: Quaternion to Euler
+  kind: concept
+  aliases:
+  - quaternion conversion
+  description: ''
+  parent: Dead Reckoning
+- name: EMA Filter
+  kind: concept
+  aliases:
+  - exponential moving average
+  - exponential moving average filter
+  description: ''
+  parent: Dead Reckoning
+- name: Deadband Threshold
+  kind: concept
+  aliases:
+  - deadband
+  - threshold gate
+  description: ''
+  parent: Dead Reckoning
+- name: QoS
+  kind: concept
+  aliases:
+  - Quality of Service
+  - BEST_EFFORT
+  - RELIABLE
+  - ROS QoS
+  description: ''
+  parent: ROS 2
+- name: Multi-source Arbitration
+  kind: concept
+  aliases:
+  - arbitration
+  - input source arbitration
+  description: ''
+- name: FSM Orchestration
+  kind: concept
+  aliases:
+  - FSM
+  - state machine
+  - finite state machine
+  description: ''
+- name: Multi-threaded Executor
+  kind: concept
+  aliases:
+  - MultiThreadedExecutor
+  - ReentrantCallbackGroup
+  - callback group
+  description: ''
+  parent: ROS 2
+- name: Settle Detection
+  kind: concept
+  aliases:
+  - settle detection
+  - motion settle
+  - sensor-feedback settle
+  description: ''
+- name: Two-phase Translate-Rotate
+  kind: concept
+  aliases:
+  - translate-then-rotate
+  - two-phase nav
+  - rotate-translate-rotate
+  description: ''
+  parent: Dead Reckoning
+- name: Vendor Abstraction
+  kind: concept
+  aliases:
+  - adapter pattern
+  - wrapper layer
+  - driver abstraction
+  description: ''
+- name: Mock Mode
+  kind: concept
+  aliases:
+  - use_mock
+  - mock data
+  description: ''
+- name: Idempotent Configuration
+  kind: concept
+  aliases:
+  - idempotent
+  - idempotency
+  - bashrc mutation
+  description: ''
+- name: Unitree
+  kind: platform
+  aliases:
+  - Unitree Robotics
+  description: Quadruped + humanoid robot manufacturer
+  parent: ''
+- name: Agibot
+  kind: platform
+  aliases: []
+  description: Humanoid robot manufacturer; AIMDK runtime
+  parent: ''
+- name: RobotEra
+  kind: platform
+  aliases:
+  - Robot Era
+  description: Humanoid robot manufacturer; XOS runtime
+  parent: ''
