@@ -99,13 +99,13 @@ def api_log_start():
 
     # Terse escape hatch: skip QA entirely.
     if data.get("terse"):
-        return _finalize_log(sid)
+        return _ask_graph_nodes_or_finalize(sid)
 
     assistant_text = core.ask_next_question(
         CLIENT, MODEL, _system_for(sess), sess["messages"],
     )
     if QUESTIONS_COMPLETE in assistant_text:
-        return _finalize_log(sid)
+        return _ask_graph_nodes_or_finalize(sid)
 
     sess["messages"].append({"role": "assistant", "content": assistant_text})
     return jsonify({
@@ -134,7 +134,7 @@ def api_log_answer():
         CLIENT, MODEL, _system_for(sess), sess["messages"],
     )
     if QUESTIONS_COMPLETE in assistant_text:
-        return _finalize_log(sid)
+        return _ask_graph_nodes_or_finalize(sid)
 
     sess["messages"].append({"role": "assistant", "content": assistant_text})
     return jsonify({"session_id": sid, "done": False, "question": assistant_text})
@@ -146,6 +146,62 @@ def api_log_done():
     sid = request.get_json(force=True).get("session_id")
     if sid not in SESSIONS:
         return jsonify({"error": "unknown session"}), 404
+    return _ask_graph_nodes_or_finalize(sid)
+
+
+GRAPH_NODES_QUESTION = (
+    "Last one — what core hardware, platforms, and abstract concepts did you "
+    "focus on today? You can list them, or type 'skip' and I'll infer them "
+    "from what we discussed."
+)
+
+
+def _ask_graph_nodes_or_finalize(sid):
+    """Pause QA at the Graph Nodes question. Skipped entirely for targets
+    that don't participate in the entity graph (biweekly, monthly, etc).
+    """
+    sess = SESSIONS[sid]
+    if sess["target"] not in core.GRAPH_NODES_TARGETS:
+        return _finalize_log(sid)
+    # Mark the session as awaiting the Graph Nodes answer.
+    sess["awaiting_graph_nodes"] = True
+    return jsonify({
+        "session_id": sid,
+        "done": False,
+        "graph_nodes_question": GRAPH_NODES_QUESTION,
+    })
+
+
+@app.post("/api/log/graph_nodes")
+def api_log_graph_nodes():
+    """Body: { session_id, answer }. Runs entity classifier and proceeds to
+    finalize. `answer` may be empty / 'skip'.
+    """
+    data = request.get_json(force=True)
+    sid = data.get("session_id")
+    sess = SESSIONS.get(sid)
+    if not sess:
+        return jsonify({"error": "unknown session"}), 404
+    if not sess.get("awaiting_graph_nodes"):
+        return jsonify({"error": "session not awaiting graph_nodes answer"}), 400
+
+    answer = (data.get("answer") or "").strip()
+    sess["awaiting_graph_nodes"] = False
+    sess["graph_nodes_answer"] = answer
+
+    # Run the classifier. Build conversation_text from session messages.
+    conversation_text = "\n\n".join(
+        f"[{m['role']}]\n{m['content']}" for m in sess["messages"]
+    )
+    try:
+        classification = core.classify_entities(
+            CLIENT, MODEL, CFG, answer, conversation_text,
+        )
+    except Exception as e:
+        # Never let classifier failure block finalization.
+        classification = {"resolved": [], "proposed": [], "error": str(e)}
+    sess["classification"] = classification
+
     return _finalize_log(sid)
 
 
@@ -159,6 +215,23 @@ def _finalize_log(sid):
         gen_prompt = core.build_amend_prompt(CFG, framing, target, existing)
     else:
         gen_prompt = core.build_generation_prompt(CFG, framing, target)
+
+    # Inject Graph Nodes instruction so the LLM emits the line under the date
+    # heading. The classifier already ran in /api/log/graph_nodes; here we
+    # only need to splice the formatted string into the generation prompt.
+    classification = sess.get("classification") or {}
+    resolved = classification.get("resolved") or []
+    graph_nodes_line = ""
+    if resolved:
+        graph_nodes_line = core.format_graph_nodes(resolved)
+    if graph_nodes_line:
+        gen_prompt = (
+            gen_prompt
+            + "\n\nIMPORTANT: directly under the date heading (## Month Day, YYYY), "
+            + "add this exact line on its own paragraph, verbatim — do not "
+            + "rewrite or rephrase it:\n\n"
+            + f"**Graph Nodes:** {graph_nodes_line}\n"
+        )
 
     generated = core.generate_entry(CLIENT, MODEL, sess["messages"], gen_prompt)
     entry, insight = core.split_entry_and_insight(generated)
@@ -177,6 +250,11 @@ def _finalize_log(sid):
         "preview": entry,
         "insight": insight,
         "topic": topic,
+        "graph_nodes": {
+            "resolved": [{"name": e["name"], "kind": e["kind"]} for e in resolved],
+            "proposed": classification.get("proposed") or [],
+            "line": graph_nodes_line,
+        },
     })
 
 
@@ -193,6 +271,17 @@ def api_log_save():
     if not entry:
         return jsonify({"error": "edited_preview required"}), 400
 
+    # Append any approved new entities to the registry BEFORE writing the
+    # daily, so future classifier calls see them and any wikilinks pointing
+    # at the new names resolve to real stub files.
+    approved_proposals = data.get("approved_proposals") or []
+    approved_added = []
+    for p in approved_proposals:
+        if not isinstance(p, dict) or "name" not in p or "kind" not in p:
+            continue
+        core.append_entity(CFG, p)
+        approved_added.append(p["name"])
+
     topic = (data.get("topic") or "").strip()
     path = core.write_target(CFG, sess["target"], entry, topic=topic or None)
     core.save_raw_input(CFG, sess["messages"], kind="log")
@@ -202,10 +291,28 @@ def api_log_save():
         ip = core.append_insight(CFG, data["insight"])
         insight_path = str(ip.relative_to(core.SCRIPT_DIR))
 
+    # If this save lands on the cycle's last workday, eagerly generate a
+    # biweekly preview the UI can open inline. Last workday = Friday of the
+    # cycle's second week, walked back past any SG public holidays. Never
+    # fires mid-cycle.
+    biweekly = None
+    if sess["target"] == "daily":
+        when = date.today()
+        if when == core.last_workday_of_cycle(when, CFG):
+            try:
+                biweekly = core.generate_biweekly_preview(
+                    CLIENT, MODEL, CFG, sess["framing"], when,
+                )
+            except Exception as e:
+                # Never let biweekly failure block the daily save.
+                biweekly = {"error": str(e)}
+
     del SESSIONS[sid]
     return jsonify({
         "saved": str(path.relative_to(core.SCRIPT_DIR)),
         "insight_saved": insight_path,
+        "biweekly": biweekly,
+        "entities_added": approved_added,
     })
 
 
@@ -277,13 +384,26 @@ def api_rollup():
 
 @app.post("/api/rollup/save")
 def api_rollup_save():
-    """Body: { target_key, edited_preview, source_dates? }."""
+    """Body: { target_key, edited_preview, source_dates?, anchor_date? }.
+
+    `anchor_date` (YYYY-MM-DD) pins the file's location for date-derived
+    path templates — e.g. a biweekly should land in the cycle's end-month
+    folder, not in today's month. Falls back to today if omitted.
+    """
     data = request.get_json(force=True)
     target_key = data.get("target_key")
     content = (data.get("edited_preview") or "").strip()
     if not target_key or not content:
         return jsonify({"error": "target_key and edited_preview required"}), 400
-    path = core.write_target(CFG, target_key, content)
+
+    anchor = None
+    if data.get("anchor_date"):
+        try:
+            anchor = datetime.strptime(data["anchor_date"], "%Y-%m-%d").date()
+        except ValueError:
+            pass
+
+    path = core.write_target(CFG, target_key, content, when=anchor)
 
     dailies = []
     for s in data.get("source_dates") or []:
@@ -292,7 +412,7 @@ def api_rollup_save():
         except ValueError:
             continue
     if dailies:
-        core.link_rollup_to_dailies(CFG, target_key, dailies)
+        core.link_rollup_to_dailies(CFG, target_key, dailies, when=anchor)
 
     return jsonify({"saved": str(path.relative_to(core.SCRIPT_DIR))})
 

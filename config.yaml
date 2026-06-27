@@ -3,18 +3,43 @@
 
 vault_path: ./logbook
 
+# Anchor for internship week numbering. Week 1 is the Mon-Sun calendar week
+# containing this date. Path templates may use {week} (internship week int)
+# and {month} (e.g. "June") in addition to the standard {date} formatters.
+internship_start: 2026-05-18
+
+# Singapore public holidays 2026 (gazetted by MOM). Used together with the
+# default Mon-Fri workweek to compute the last workday of a biweekly cycle
+# — that's when the biweekly preview auto-fires instead of cycle day 14.
+public_holidays:
+  - 2026-01-01   # New Year's Day
+  - 2026-02-17   # Chinese New Year
+  - 2026-02-18   # Chinese New Year
+  - 2026-03-21   # Hari Raya Puasa
+  - 2026-04-03   # Good Friday
+  - 2026-05-01   # Labour Day
+  - 2026-05-27   # Hari Raya Haji
+  - 2026-06-01   # Vesak Day (observed Mon)
+  - 2026-08-10   # National Day (observed Mon)
+  - 2026-11-09   # Deepavali (observed Mon)
+  - 2026-12-25   # Christmas Day
+
 defaults:
   framing: internship
   target: daily
 
-# Output targets. `path` is a strftime-style template.
+# Output targets. `path` is a Python str.format template with these tokens:
+#   {date}   — datetime.date, supports strftime (%Y-%m-%d etc.)
+#   {month}  — month name (e.g. "June")
+#   {week}   — internship week number (int >= 1)
+#   {topic}  — LLM-picked daily topic (only daily uses it today)
 # `mode`:
-#   amend       — load existing entry, regenerate based on additions (one clean file per day)
+#   amend       — load existing entry, regenerate based on additions
 #   append      — always append a new block
-#   write_or_append — create if missing, append if present (used for ad-hoc rollups)
+#   write_or_append — create if missing, append if present
 targets:
   daily:
-    path: "daily/{date:%Y-%m}/{date:%Y-%m-%d} {topic}.md"
+    path: "{month}/Week_{week}/{topic}.md"
     mode: amend
     sections:
       - "Summary"
@@ -25,11 +50,11 @@ targets:
     footer: "- [ ] Obtain supervisor clearance for confidentiality before submitting"
 
   raw:
-    path: "raw/{date:%Y-%m}/{date:%Y-%m-%d}.md"
+    path: "{month}/Week_{week}/raw/{date:%d-%m-%y}.md"
     mode: append
 
   weekly:
-    path: "weekly/{date:%Y}/{date:%Y-W%V}.md"
+    path: "{month}/Week_{week}/Weekly_W{week}.md"
     mode: append
     rollup_window_days: 7
     sections:
@@ -41,7 +66,9 @@ targets:
     footer: "- [ ] Obtain supervisor clearance for confidentiality before submitting"
 
   biweekly:
-    path: "biweekly/{date:%Y}/{date:%Y-W%V}.md"
+    # Lives in the month containing the cycle's last day (Sun of week B).
+    # Filename is Biweekly_W{a}-W{b}.md.
+    path: "{cycle_month}/Biweekly_{week_pair_full}.md"
     mode: append
     rollup_window_days: 14
     sections:
@@ -53,7 +80,7 @@ targets:
     footer: "- [ ] Obtain supervisor clearance for confidentiality before submitting"
 
   monthly:
-    path: "monthly/{date:%Y}/{date:%Y-%m}.md"
+    path: "{date:%Y}/Monthly_{month}.md"
     mode: append
     rollup_window_days: 31
     sections:
