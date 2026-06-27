@@ -373,22 +373,36 @@ def api_rollup():
         system=system,
         messages=[{"role": "user", "content": f"Daily entries:\n\n{concat}\n\n{generation}"}],
     )
+    preview = response.content[0].text
+
+    # Pick a topic for the rollup's filename if the target uses {topic}.
+    topic = ""
+    if "{topic}" in CFG["targets"][target_key].get("path", ""):
+        try:
+            topic = core.pick_topic(CLIENT, MODEL, preview)
+        except Exception:
+            topic = ""
+
     return jsonify({
-        "preview": response.content[0].text,
+        "preview": preview,
         "target_key": target_key,
         "entry_count": len(entries),
         "period": period_label,
         "source_dates": [d.isoformat() for d, _ in entries],
+        "topic": topic,
     })
 
 
 @app.post("/api/rollup/save")
 def api_rollup_save():
-    """Body: { target_key, edited_preview, source_dates?, anchor_date? }.
+    """Body: { target_key, edited_preview, source_dates?, anchor_date?, topic? }.
 
     `anchor_date` (YYYY-MM-DD) pins the file's location for date-derived
     path templates — e.g. a biweekly should land in the cycle's end-month
     folder, not in today's month. Falls back to today if omitted.
+    `topic` is the LLM-picked filename topic for rollup targets whose path
+    template includes `{topic}` (currently weekly/biweekly). Empty falls
+    back to the W-numbered stem (e.g. Weekly_W4).
     """
     data = request.get_json(force=True)
     target_key = data.get("target_key")
@@ -403,7 +417,8 @@ def api_rollup_save():
         except ValueError:
             pass
 
-    path = core.write_target(CFG, target_key, content, when=anchor)
+    topic = (data.get("topic") or "").strip()
+    path = core.write_target(CFG, target_key, content, when=anchor, topic=topic or None)
 
     dailies = []
     for s in data.get("source_dates") or []:

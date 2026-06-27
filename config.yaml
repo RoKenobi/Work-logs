@@ -54,7 +54,9 @@ targets:
     mode: append
 
   weekly:
-    path: "{month}/Week_{week}/Weekly_W{week}.md"
+    # {topic} is filled by core.pick_topic() against the generated content.
+    # Falls back to "Weekly_W{week}" if topic-picker fails.
+    path: "{month}/Week_{week}/{topic}.md"
     mode: append
     rollup_window_days: 7
     sections:
@@ -67,8 +69,9 @@ targets:
 
   biweekly:
     # Lives in the month containing the cycle's last day (Sun of week B).
-    # Filename is Biweekly_W{a}-W{b}.md.
-    path: "{cycle_month}/Biweekly_{week_pair_full}.md"
+    # {topic} is filled by core.pick_topic() against the generated content.
+    # Falls back to "Biweekly_{week_pair_full}" if topic-picker fails.
+    path: "{cycle_month}/{topic}.md"
     mode: append
     rollup_window_days: 14
     sections:
