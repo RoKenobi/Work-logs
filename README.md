@@ -1,34 +1,85 @@
-# Internship Logger
+# work-logs
 
-A Python-based CLI tool designed to track daily robotics and AI engineering tasks, bugs, and solutions. It dynamically queries for missing context and automatically appends the data to local markdown files for academic reporting.
+A localhost web UI for capturing daily work as structured markdown, then rolling
+entries up into weekly / biweekly / monthly / custom-range / final reports.
+Notes land in an Obsidian vault (`./logbook/`). Conversation is driven by Claude
+via AWS Bedrock; sections, prompts, and paths live in `config.yaml`.
 
-## Features
+## Layout
 
-* Interactive terminal UI powered by the `rich` library.
-* AI-driven prompt completion to ensure all technical blockers and academic learnings are recorded.
-* Outputs directly into structured Markdown files.
-
-## Installation
-
-Clone the repository to your local machine:
-
-    git clone https://github.com/YOUR_GITHUB_USERNAME/internship-logger.git
-    cd ntu-internship-logger
+```
+work_logs/
+├── server.py         # Flask backend
+├── core.py           # config, Claude client, file I/O (shared)
+├── config.yaml       # sections, framings, paths, rollup windows
+├── static/
+│   ├── index.html    # single-page UI
+│   ├── style.css
+│   └── app.js
+├── .env              # AWS_BEARER_TOKEN_BEDROCK lives here (gitignored)
+└── logbook/          # Obsidian vault — all generated notes land here
+    ├── daily/
+    ├── weekly/
+    ├── biweekly/
+    ├── monthly/
+    └── final_report.md
+```
 
 ## Setup
 
-1. Install the required Python dependencies:
+```bash
+pip install flask rich anthropic pyyaml
+```
 
-    pip install rich python-dotenv anthropic
+Create `.env` in the repo root:
 
-2. Create a `.env` file in the root directory and add your API token:
+```
+AWS_BEARER_TOKEN_BEDROCK="your_token"
+AWS_REGION=us-east-1
+ANTHROPIC_DEFAULT_SONNET_MODEL=us.anthropic.claude-sonnet-4-5-20250929-v1:0
+```
 
-    AWS_BEARER_TOKEN_BEDROCK="your_actual_token_here"
+## Run
 
-## Usage
+```bash
+python server.py
+```
 
-Run the logger at the end of your shift:
+Then open <http://127.0.0.1:5000>.
 
-    python3 logger.py
+## Three modes
 
-The script will prompt you for a brain dump, ask context-aware clarifying questions, and save the formatted output directly to your active log files.
+- **Today** — drop a brain dump, answer follow-ups, preview & save a daily entry.
+  - "Just save this, no questions" — skip Q&A entirely (terse / lazy-day mode).
+  - "That's all" — finish Q&A early when you've covered everything.
+  - Re-running on the same day **amends** the existing entry (one clean file per day).
+- **Rollup** — synthesize daily entries into a weekly / biweekly / monthly /
+  final-report file. Or check "custom date range" and pick any window.
+- **Catchup** — for "I haven't logged in a month" days. Brain-dump the whole
+  period; Claude generates one summary file PLUS dated highlight entries for
+  3-5 memorable days. Uncheck any highlights you don't want kept.
+
+Every save shows a preview first — edit before it lands in the vault.
+
+## Configuration
+
+`config.yaml` controls everything that isn't code:
+
+- **`framings`** — system + generation prompts. Two are shipped: `internship`
+  (academic / CS-theory framing, supervisor-clearance footer) and you can add
+  more.
+- **`targets`** — output files. Each has a `path` template, write `mode`
+  (`amend`, `append`, or `write_or_append`), and `sections` that become the
+  `###` headings in the generated entry.
+
+Question count is **adaptive** — there are no fixed quotas. If the brain dump
+is short or says "nothing happened today", Claude asks 0–1 questions and stops.
+
+## Token notes
+
+- Daily entries: typically 1 system prompt + 1–4 short conversation turns +
+  one ~2k-token generation. Light days cost almost nothing.
+- Rollups concatenate the raw daily entries in a single non-conversational
+  call — most expensive operation, but you only run them on demand.
+- `max_tokens` is set to 2048 for log/rollup generation, 4096 only for catchup
+  (which produces summary + multiple highlight entries).

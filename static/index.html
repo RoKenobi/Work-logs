@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>work-logs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>work-logs</h1>
+  <nav id="mode-nav">
+    <button data-mode="log"     class="active">Today</button>
+    <button data-mode="rollup">Rollup</button>
+    <button data-mode="catchup">Catchup</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ============ LOG (Today) ============ -->
+<section id="mode-log" class="mode">
+  <div id="today-status" class="status"></div>
+
+  <div id="log-start" class="card">
+    <label>Brain dump <span class="hint">— what you worked on, blockers, anything. Or "nothing much today".</span></label>
+    <textarea id="log-dump" rows="10" placeholder="I worked on..."></textarea>
+    <div class="row">
+      <button id="log-start-btn" class="primary">Start</button>
+      <button id="log-terse-btn" class="ghost" title="Skip the Q&amp;A — just structure what I wrote">Just save this, no questions</button>
+    </div>
+  </div>
+
+  <div id="log-chat" class="card hidden">
+    <div id="log-thread" class="thread"></div>
+    <div id="log-answer-row" class="row hidden">
+      <textarea id="log-answer" rows="2" placeholder="Your answer..."></textarea>
+      <button id="log-answer-btn" class="primary">Send</button>
+      <button id="log-done-btn" class="ghost" title="That's enough context — generate now">That's all</button>
+    </div>
+  </div>
+
+  <div id="log-preview" class="card hidden">
+    <label>Topic <span class="hint">— 2-5 words; becomes part of the filename.</span></label>
+    <input type="text" id="log-topic" maxlength="48" />
+    <label>Preview <span class="hint">— edit before saving. This goes into your Obsidian vault.</span></label>
+    <textarea id="log-preview-ta" rows="20"></textarea>
+    <div id="log-insight-block" class="hidden">
+      <label>Technical Insight</label>
+      <textarea id="log-insight-ta" rows="6"></textarea>
+      <label class="check"><input type="checkbox" id="log-save-insight" checked> Append to final_report.md</label>
+    </div>
+    <div class="row">
+      <button id="log-save-btn" class="primary">Save to vault</button>
+      <button id="log-cancel-btn" class="ghost">Discard</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROLLUP ============ -->
+<section id="mode-rollup" class="mode hidden">
+  <div class="card">
+    <label>Cadence</label>
+    <div class="row">
+      <select id="rollup-cadence">
+        <option value="weekly">Weekly (last 7 days)</option>
+        <option value="biweekly">Biweekly (last 14 days)</option>
+        <option value="monthly">Monthly (last 31 days)</option>
+        <option value="final-report">Final report (all entries)</option>
+      </select>
+    </div>
+
+    <label class="check"><input type="checkbox" id="rollup-custom"> Custom date range</label>
+    <div id="rollup-range" class="row hidden">
+      <input type="date" id="rollup-start">
+      <span class="hint">to</span>
+      <input type="date" id="rollup-end">
+    </div>
+
+    <div class="row">
+      <button id="rollup-run-btn" class="primary">Generate</button>
+    </div>
+    <div id="rollup-status" class="status"></div>
+  </div>
+
+  <div id="rollup-preview" class="card hidden">
+    <label>Preview <span class="hint">— edit before saving.</span></label>
+    <textarea id="rollup-preview-ta" rows="20"></textarea>
+    <div class="row">
+      <button id="rollup-save-btn" class="primary">Save to vault</button>
+      <button id="rollup-discard-btn" class="ghost">Discard</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CATCHUP ============ -->
+<section id="mode-catchup" class="mode hidden">
+  <div id="catchup-start" class="card">
+    <label>Target</label>
+    <select id="catchup-target">
+      <option value="monthly">Monthly summary</option>
+      <option value="weekly">Weekly summary</option>
+      <option value="biweekly">Biweekly summary</option>
+    </select>
+
+    <label>Brain dump <span class="hint">— recap the whole period. Mention specific dates if you remember them.</span></label>
+    <textarea id="catchup-dump" rows="12" placeholder="Over the last month I..."></textarea>
+    <div class="row">
+      <button id="catchup-start-btn" class="primary">Start</button>
+    </div>
+  </div>
+
+  <div id="catchup-chat" class="card hidden">
+    <div id="catchup-thread" class="thread"></div>
+    <div id="catchup-answer-row" class="row hidden">
+      <textarea id="catchup-answer" rows="2" placeholder="Your answer..."></textarea>
+      <button id="catchup-answer-btn" class="primary">Send</button>
+      <button id="catchup-done-btn" class="ghost">That's all</button>
+    </div>
+  </div>
+
+  <div id="catchup-preview" class="card hidden">
+    <label>Summary <span class="hint">— edit before saving.</span></label>
+    <textarea id="catchup-summary-ta" rows="14"></textarea>
+
+    <div id="catchup-highlights"></div>
+
+    <div class="row">
+      <button id="catchup-save-btn" class="primary">Save to vault</button>
+      <button id="catchup-discard-btn" class="ghost">Discard</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
