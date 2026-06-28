@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 12-06-26
-  - 2026-06-12
+date: 2026-06-12
 ---
 
 # Daily
@@ -10,7 +8,7 @@ aliases:
 
 **Graph Nodes:** [[Agibot X2 Ultra]], [[Praxis SDK]], [[Unitree Go2]], [[Agibot A2 Ultra]], [[AIMDK]] · #DDS #MultisourceArbitration #DeadReckoning #colcon
 
-**Theme:** [[Robotics Middleware Infrastructure]] (5 shared) · [[Robot Middleware Integration]] (3 shared)
+**Theme:** [[ROS 2 Robotics Middleware]] (6 shared) · [[Robotics Integration Infrastructure]] (3 shared)
 
 ### Summary
 Started the Agibot X2 Ultra integration — a bipedal humanoid whose locomotion API is *neither* continuous odom (Go2) nor discrete RPC (A2), but instead a streaming `McLocomotionVelocity` topic whose publishers are selected by a priority arbiter. Today's headline result was diagnosing why the driver's velocity commands were going out at 10 Hz but the robot wasn't moving: AIMDK's multi-source arbiter was silently ignoring an unregistered publisher. Resolution: explicit `SetMcInputSource` service call at startup with high priority.
@@ -46,6 +44,6 @@ Started the Agibot X2 Ultra integration — a bipedal humanoid whose locomotion 
 
 ## Rolled up into
 
-[[2026-W25]]
+[[Agibot X2 and RobotEra Q5 Integration]]
 
 ---

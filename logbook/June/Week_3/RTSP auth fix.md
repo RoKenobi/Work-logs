@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 02-06-26
-  - 2026-06-02
+date: 2026-06-02
 ---
 
 # Daily
@@ -10,7 +8,7 @@ aliases:
 
 **Graph Nodes:** [[Praxis Platform]] · #RTSP #MediaMTX #Docker #H264 #HTTP #JWT
 
-**Theme:** [[Praxis Integration Toolchain]] (6 shared)
+**Theme:** [[Robotics Integration Infrastructure]] (3 shared) · [[Video Streaming Infrastructure]] (3 shared)
 
 ### Tasks Completed
 - Debugged and resolved RTSP video streaming authentication failures preventing live camera feed from reaching Praxis dashboard
@@ -36,4 +34,4 @@ aliases:
 
 ## Rolled up into
 
-[[2026-W26]]
+[[Unitree Go2 ROS 2 Integration]]

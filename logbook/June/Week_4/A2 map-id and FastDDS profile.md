@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 11-06-26
-  - 2026-06-11
+date: 2026-06-11
 ---
 
 # Daily
@@ -10,7 +8,7 @@ aliases:
 
 **Graph Nodes:** [[Agibot A2 Ultra]], [[AIMDK]], [[Praxis Platform]] · #ROS2 #DDS #tmuxinator #colcon #systemd #MQTT #DeadReckoning #QoS #IdempotentConfiguration #VendorAbstraction
 
-**Theme:** [[Robotics Middleware Infrastructure]] (9 shared) · [[Praxis Integration Toolchain]] (4 shared)
+**Theme:** [[ROS 2 Robotics Middleware]] (10 shared) · [[Robotics Integration Infrastructure]] (3 shared)
 
 ### Summary
 Resolved the two remaining blockers to A2 production readiness: the AIMDK-vs-Praxis map-id namespace mismatch that caused every `SpinTurnAndMoveForward` to fail with `CommonState_FAIL`, and the FastDDS profile + `ROS_DOMAIN_ID` + `ROS_LOCALHOST_ONLY` interaction that prevented the in-process publishers from discovering AIMDK topics. A2 now runs end-to-end on a single `praxis_start` alias with a six-line `pre_window` sourcing chain that no operator has to remember.
@@ -50,6 +48,6 @@ Resolved the two remaining blockers to A2 production readiness: the AIMDK-vs-Pra
 
 ## Rolled up into
 
-[[2026-W24]]
+[[Agibot A2 Ultra ROS2 Integration]]
 
 ---

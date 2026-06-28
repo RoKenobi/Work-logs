@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 18-06-26
-  - 2026-06-18
+date: 2026-06-18
 ---
 
 # Daily
@@ -10,7 +8,7 @@ aliases:
 
 **Graph Nodes:** [[RobotEra Q5]] · #SE2Composition #DeadReckoning #FSMOrchestration #CycloneDDS #ROS2 #QoS
 
-**Theme:** [[Robotics Middleware Infrastructure]] (4 shared) · [[Robot Middleware Integration]] (3 shared)
+**Theme:** [[ROS 2 Robotics Middleware]] (6 shared)
 
 ### Summary
 Shipped the Q5 navigation stack: SE(2) dead-reckoning executor (same algebra as Go2, ported in an afternoon thanks to the shared utility module), velocity ramping for the 70 kg differential-drive chassis, and the discovery that the Q5 uses `geometry_msgs/TwistStamped` rather than the more common `Twist`. Also wired up the 34-DoF joint-state aggregator — highest-DoF robot in the fleet by a wide margin — and battery telemetry with calibrated SoC thresholds matching the physical LED warnings.
@@ -46,6 +44,6 @@ Shipped the Q5 navigation stack: SE(2) dead-reckoning executor (same algebra as 
 
 ## Rolled up into
 
-[[2026-W25]]
+[[Agibot X2 and RobotEra Q5 Integration]]
 
 ---

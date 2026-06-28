@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 30-05-26
-  - 2026-05-30
+date: 2026-05-30
 ---
 
 # Daily
@@ -34,4 +32,4 @@ aliases:
 
 ## Rolled up into
 
-[[2026-W26]]
+[[Unitree Go2 ROS 2 Integration]]

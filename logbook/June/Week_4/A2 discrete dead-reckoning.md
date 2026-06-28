@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 09-06-26
-  - 2026-06-09
+date: 2026-06-09
 ---
 
 # Daily
@@ -10,7 +8,7 @@ aliases:
 
 **Graph Nodes:** [[Agibot A2 Ultra]], [[Agibot D1 Max]], [[RobotEra Q5]], [[Unitree Go2]], [[AIMDK]], [[Praxis Platform]] · #ROS2 #Python #HTTP #JSONRPC #SE2Composition #DeadReckoning #MultithreadedExecutor #TwophaseTranslateRotate
 
-**Theme:** [[Robotics Middleware Infrastructure]] (9 shared) · [[Robot Middleware Integration]] (4 shared)
+**Theme:** [[ROS 2 Robotics Middleware]] (11 shared) · [[Robotics Integration Infrastructure]] (3 shared)
 
 ### Summary
 Authored the flagship node of the A2 driver — `translate_and_rotate_executor` — implementing a discrete-step dead-reckoning model for a humanoid whose locomotion is RPC-planned (`SpinTurnAndMoveForward`) rather than velocity-streamed. The discrete integrator commits planned `(rotation, distance)` to the odom frame only after the RPC reports success, with the same SE(2) composition as the Go2 driver but on a per-move time base. This pattern has since been ported to D1 Max and Q5.
@@ -45,6 +43,6 @@ Authored the flagship node of the A2 driver — `translate_and_rotate_executor` 
 
 ## Rolled up into
 
-[[2026-W24]]
+[[Agibot A2 Ultra ROS2 Integration]]
 
 ---

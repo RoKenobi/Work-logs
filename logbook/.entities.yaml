@@ -20,54 +20,57 @@ entities:
   aliases:
   - Go2
   - Unitree Quadruped
-  description: Quadruped robot (Edu/Pro variant)
   parent: Unitree
+  description: Quadruped robot (Edu/Pro variant)
 - name: Agibot A2 Ultra
   kind: hardware
   aliases:
   - A2
   - A2 Ultra
   - Agibot A2
-  description: Life-sized humanoid, "Ultra" SKU
   parent: Agibot
+  description: Life-sized humanoid, "Ultra" SKU
 - name: Agibot X2 Ultra
   kind: hardware
   aliases:
   - X2
   - X2 Ultra
   - Agibot X2
-  description: Bipedal humanoid with full-body joints, hands, screen
   parent: Agibot
+  description: Bipedal humanoid with full-body joints, hands, screen
 - name: Agibot D1 Max
   kind: hardware
   aliases:
   - D1
   - D1 Max
-  description: Agibot D1 humanoid (Max SKU)
   parent: Agibot
+  description: Agibot D1 humanoid (Max SKU)
 - name: RobotEra Q5
   kind: hardware
   aliases:
   - Q5
   - RobotEra Q5 Pro
-  description: 60 V wheeled-base humanoid, 34 DoF, dexterous hands
   parent: RobotEra
+  description: 60 V wheeled-base humanoid, 34 DoF, dexterous hands
 - name: Jetson Orin
   kind: hardware
   aliases:
   - Orin
   - NVIDIA Orin
   - Jetson
+  parent: ''
   description: On-robot edge compute
 - name: Arduino
   kind: hardware
   aliases: []
+  parent: ''
   description: USB-serial bridge for strobe / aux IO
 - name: GMSL Camera
   kind: hardware
   aliases:
   - gmslcam6
   - /dev/gmslcam6
+  parent: ''
   description: MIPI GMSL interaction camera (A2)
 - name: Praxis Platform
   kind: platform
@@ -75,37 +78,38 @@ entities:
   - Praxis
   - praxis
   - Praxis Robotics Platform
+  parent: ''
   description: Multi-robot orchestration platform
 - name: Praxis SDK
   kind: platform
   aliases:
   - praxis_sdk
   - PraxisClient
-  description: Python SDK; publishers, executors, JWT, spatial helpers
   parent: Praxis Platform
+  description: Python SDK; publishers, executors, JWT, spatial helpers
 - name: Praxis Agents
   kind: platform
   aliases:
   - praxis_agents
   - robot_agent
   - concierge_agent
-  description: ADK/Bedrock LLM agent service
   parent: Praxis Platform
+  description: ADK/Bedrock LLM agent service
 - name: AIMDK
   kind: platform
   aliases:
   - aimdk
   - AIMDK runtime
   - AIMDK SDK
-  description: Agibot on-robot runtime + JSON-RPC surface
   parent: Agibot
+  description: Agibot on-robot runtime + JSON-RPC surface
 - name: XOS Runtime
   kind: platform
   aliases:
   - XOS
   - RobotEra XOS
-  description: Q5 internal HTTP runtime (port 1888)
   parent: RobotEra
+  description: Q5 internal HTTP runtime (port 1888)
 - name: ROS 2
   kind: software
   aliases:
@@ -113,18 +117,21 @@ entities:
   - ROS
   - rclpy
   - ros2
+  parent: ''
   description: Robot Operating System v2
 - name: Python
   kind: software
   aliases:
   - python
   - python3
+  parent: ''
   description: ''
 - name: FFmpeg
   kind: software
   aliases:
   - ffmpeg
   - libx264
+  parent: ''
   description: ''
 - name: OpenCV
   kind: software
@@ -132,12 +139,14 @@ entities:
   - opencv
   - cv2
   - cv_bridge
+  parent: ''
   description: ''
 - name: GStreamer
   kind: software
   aliases:
   - gstreamer
   - gst
+  parent: ''
   description: ''
 - name: Docker
   kind: software
@@ -145,66 +154,77 @@ entities:
   - docker
   - Docker Compose
   - docker compose
+  parent: ''
   description: ''
 - name: tmuxinator
   kind: software
   aliases:
   - tmux
   - tmuxinator profile
+  parent: ''
   description: ''
 - name: systemd
   kind: software
   aliases:
   - systemd unit
+  parent: ''
   description: ''
 - name: colcon
   kind: software
   aliases:
   - colcon build
-  description: ''
   parent: ROS 2
+  description: ''
 - name: MediaMTX
   kind: software
   aliases:
   - mediamtx
+  parent: ''
   description: RTSP server
 - name: VerneMQ
   kind: software
   aliases:
   - vernemq
   - vernemq broker
+  parent: ''
   description: MQTT broker
 - name: Google ADK
-  kind: software
+  kind: platform
   aliases:
   - ADK
   - Agent Development Kit
+  parent: ''
   description: ''
 - name: AWS Bedrock
   kind: software
   aliases:
   - Bedrock
   - bedrock
+  parent: ''
   description: ''
 - name: Pydantic
   kind: software
   aliases:
   - pydantic
+  parent: ''
   description: ''
 - name: NumPy
   kind: software
   aliases:
   - numpy
+  parent: ''
   description: ''
 - name: Flask
   kind: software
   aliases:
   - flask
+  parent: ''
   description: ''
 - name: MQTT
   kind: protocol
   aliases:
   - mqtt
+  parent: ''
   description: ''
 - name: DDS
   kind: protocol
@@ -212,36 +232,41 @@ entities:
   - FastDDS
   - FastRTPS
   - fastdds
+  parent: ''
   description: ''
 - name: CycloneDDS
   kind: protocol
   aliases:
   - cyclonedds
   - rmw_cyclonedds_cpp
-  description: ''
   parent: DDS
+  description: ''
 - name: RTSP
   kind: protocol
   aliases:
   - rtsp
+  parent: ''
   description: ''
 - name: HTTP
   kind: protocol
   aliases:
   - REST
   - HTTP/JSON-RPC
+  parent: ''
   description: ''
 - name: JSON-RPC
   kind: protocol
   aliases:
   - json-rpc
   - jsonrpc
+  parent: ''
   description: ''
 - name: JWT
   kind: protocol
   aliases:
   - jwt
   - JSON Web Token
+  parent: ''
   description: ''
 - name: H.264
   kind: protocol
@@ -249,45 +274,49 @@ entities:
   - h264
   - H264
   - libx264
+  parent: ''
   description: ''
 - name: V4L2
   kind: protocol
   aliases:
   - v4l2
   - Video4Linux
+  parent: ''
   description: ''
 - name: ALSA
   kind: protocol
   aliases:
   - alsa
+  parent: ''
   description: ''
 - name: IGMP
   kind: protocol
   aliases:
   - multicast
   - IGMP multicast
+  parent: ''
   description: ''
 - name: ROS Topic
   kind: protocol
   aliases:
   - topic
   - pub-sub
-  description: ''
   parent: ROS 2
+  description: ''
 - name: ROS Service
   kind: protocol
   aliases:
   - service
   - srv
-  description: ''
   parent: ROS 2
+  description: ''
 - name: ROS Action
   kind: protocol
   aliases:
   - action
   - action server
-  description: ''
   parent: ROS 2
+  description: ''
 - name: SE(2) Composition
   kind: concept
   aliases:
@@ -295,35 +324,36 @@ entities:
   - SE2
   - Lie group composition
   - frame composition
-  description: ''
   parent: Dead Reckoning
+  description: ''
 - name: Dead Reckoning
   kind: concept
   aliases:
   - dead-reckoning
   - dead reckoning
   - odometry integration
+  parent: ''
   description: ''
 - name: Quaternion to Euler
   kind: concept
   aliases:
   - quaternion conversion
-  description: ''
   parent: Dead Reckoning
+  description: ''
 - name: EMA Filter
   kind: concept
   aliases:
   - exponential moving average
   - exponential moving average filter
-  description: ''
   parent: Dead Reckoning
+  description: ''
 - name: Deadband Threshold
   kind: concept
   aliases:
   - deadband
   - threshold gate
-  description: ''
   parent: Dead Reckoning
+  description: ''
 - name: QoS
   kind: concept
   aliases:
@@ -331,13 +361,14 @@ entities:
   - BEST_EFFORT
   - RELIABLE
   - ROS QoS
-  description: ''
   parent: ROS 2
+  description: ''
 - name: Multi-source Arbitration
   kind: concept
   aliases:
   - arbitration
   - input source arbitration
+  parent: ''
   description: ''
 - name: FSM Orchestration
   kind: concept
@@ -345,6 +376,7 @@ entities:
   - FSM
   - state machine
   - finite state machine
+  parent: ''
   description: ''
 - name: Multi-threaded Executor
   kind: concept
@@ -352,14 +384,15 @@ entities:
   - MultiThreadedExecutor
   - ReentrantCallbackGroup
   - callback group
-  description: ''
   parent: ROS 2
+  description: ''
 - name: Settle Detection
   kind: concept
   aliases:
   - settle detection
   - motion settle
   - sensor-feedback settle
+  parent: ''
   description: ''
 - name: Two-phase Translate-Rotate
   kind: concept
@@ -367,20 +400,22 @@ entities:
   - translate-then-rotate
   - two-phase nav
   - rotate-translate-rotate
-  description: ''
   parent: Dead Reckoning
+  description: ''
 - name: Vendor Abstraction
   kind: concept
   aliases:
   - adapter pattern
   - wrapper layer
   - driver abstraction
+  parent: ''
   description: ''
 - name: Mock Mode
   kind: concept
   aliases:
   - use_mock
   - mock data
+  parent: ''
   description: ''
 - name: Idempotent Configuration
   kind: concept
@@ -388,21 +423,131 @@ entities:
   - idempotent
   - idempotency
   - bashrc mutation
+  parent: ''
   description: ''
 - name: Unitree
   kind: platform
   aliases:
   - Unitree Robotics
-  description: Quadruped + humanoid robot manufacturer
   parent: ''
+  description: Quadruped + humanoid robot manufacturer
 - name: Agibot
   kind: platform
   aliases: []
-  description: Humanoid robot manufacturer; AIMDK runtime
   parent: ''
+  description: Humanoid robot manufacturer; AIMDK runtime
 - name: RobotEra
   kind: platform
   aliases:
   - Robot Era
-  description: Humanoid robot manufacturer; XOS runtime
   parent: ''
+  description: Humanoid robot manufacturer; XOS runtime
+- name: vLLM
+  kind: platform
+  aliases:
+  - vllm
+  - vLLM server
+  parent: ''
+  description: Open-source LLM inference and serving engine
+- name: LiteLLM
+  kind: platform
+  aliases:
+  - litellm
+  - LiteLlm
+  parent: Google ADK
+  description: Provider-agnostic LLM client (used inside ADK)
+- name: HuggingFace
+  kind: platform
+  aliases:
+  - Hugging Face
+  - huggingface
+  - HF
+  parent: ''
+  description: Model hub + HF cache for vLLM weights
+- name: Gemma
+  kind: software
+  aliases:
+  - Gemma 4
+  - gemma-4
+  - gemma-e4b
+  - gemma-26b
+  - Gemma-26B-A4B-it
+  parent: ''
+  description: Google Gemma family of open-weights LLMs
+- name: Claude
+  kind: software
+  aliases:
+  - Claude Sonnet
+  - Sonnet
+  - claude-sonnet-4-6
+  parent: ''
+  description: Anthropic Claude family
+- name: OpenAI-compatible API
+  kind: protocol
+  aliases:
+  - OpenAI API
+  - openai-compatible
+  - /v1/chat/completions
+  parent: ''
+  description: REST endpoint shape that lets any OpenAI SDK client point at any backend
+- name: Tool Calling
+  kind: protocol
+  aliases:
+  - function calling
+  - tool-call-parser
+  - tool_calls
+  parent: OpenAI-compatible API
+  description: Structured tool/function-calling protocol over chat completions
+- name: PagedAttention
+  kind: concept
+  aliases:
+  - paged attention
+  - KV-cache paging
+  parent: ''
+  description: OS-paging-style KV cache management in vLLM
+- name: Continuous Batching
+  kind: concept
+  aliases:
+  - continuous batching
+  - token-level batching
+  parent: ''
+  description: Token-level request scheduling in LLM inference
+- name: Incident Response
+  kind: concept
+  aliases:
+  - multi-robot incident response
+  - incident-response playbook
+  - agentic incident response
+  parent: ''
+  description: Staged-verification multi-robot dispatch pattern
+- name: Recipe-style Prompt
+  kind: concept
+  aliases:
+  - recipe prompt
+  - literal recipe
+  - recipe-style
+  parent: ''
+  description: Concrete, literal, sequenced prompt over abstract one for smaller models
+- name: Staged Verification
+  kind: concept
+  aliases:
+  - staged-verification
+  - tiered confidence
+  - confidence escalation
+  parent: Incident Response
+  description: Multi-sensor evidence accumulation (50 -> 75 -> 95)
+- name: Provider Abstraction
+  kind: concept
+  aliases:
+  - LiteLLM abstraction
+  - model provider abstraction
+  parent: Vendor Abstraction
+  description: Vendor-agnostic LLM provider interface; analogue of vendor-neutral robot SDK
+- name: Blackwell GPU
+  kind: hardware
+  aliases:
+  - Blackwell
+  - sm_120
+  - Blackwell workstation
+  parent: ''
+  description: NVIDIA Blackwell-architecture GPU; CUDA Error 803 host

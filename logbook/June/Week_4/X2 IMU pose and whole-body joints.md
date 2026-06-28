@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 13-06-26
-  - 2026-06-13
+date: 2026-06-13
 ---
 
 # Daily
@@ -10,7 +8,7 @@ aliases:
 
 **Graph Nodes:** [[Agibot X2 Ultra]], [[Unitree Go2]], [[Agibot A2 Ultra]], [[Praxis Platform]], [[AIMDK]] · #ROS2 #MultithreadedExecutor #DeadReckoning #SE2Composition #QuaterniontoEuler #EMAFilter #DeadbandThreshold
 
-**Theme:** [[Robotics Middleware Infrastructure]] (9 shared)
+**Theme:** [[ROS 2 Robotics Middleware]] (9 shared) · [[Robotics Integration Infrastructure]] (3 shared)
 
 ### Summary
 Built the X2's IMU-fused dead-reckoning executor and the whole-body joint aggregator that merges four separate joint topics into a single Praxis publish stream. Key insight: read **absolute yaw** from the chest IMU's orientation quaternion rather than integrating angular velocity — the same stationary-drift class of bug the Go2 hit, but solved with a different fix because the X2 exposes a fused quaternion the Go2 doesn't.
@@ -42,6 +40,6 @@ Built the X2's IMU-fused dead-reckoning executor and the whole-body joint aggreg
 
 ## Rolled up into
 
-[[2026-W25]]
+[[Agibot X2 and RobotEra Q5 Integration]]
 
 ---

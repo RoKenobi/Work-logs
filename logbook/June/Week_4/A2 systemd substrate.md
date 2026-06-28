@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 08-06-26
-  - 2026-06-08
+date: 2026-06-08
 ---
 
 # Daily
@@ -10,7 +8,7 @@ aliases:
 
 **Graph Nodes:** [[Agibot A2 Ultra]], [[AIMDK]], [[Jetson Orin]] · #ROS2 #Python #systemd #HTTP #JSONRPC #DDS
 
-**Theme:** [[Robotics Middleware Infrastructure]] (8 shared)
+**Theme:** [[ROS 2 Robotics Middleware]] (8 shared)
 
 ### Summary
 Stood up the on-board service substrate for the Agibot A2 Ultra integration — four `systemd`-managed Python servers that wrap AIMDK's JSON-RPC endpoints as ROS 2 services and actions, with heartbeat-gated preflight launchers that hard-guarantee the AIMDK runtime is alive before any Praxis publisher tries to talk to it. This is the foundation the rest of the A2 driver builds on.
@@ -46,6 +44,6 @@ Stood up the on-board service substrate for the Agibot A2 Ultra integration — 
 
 ## Rolled up into
 
-[[2026-W24]]
+[[Agibot A2 Ultra ROS2 Integration]]
 
 ---

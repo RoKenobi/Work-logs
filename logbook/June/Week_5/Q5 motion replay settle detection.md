@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 19-06-26
-  - 2026-06-19
+date: 2026-06-19
 ---
 
 # Daily
@@ -10,7 +8,7 @@ aliases:
 
 **Graph Nodes:** [[RobotEra Q5]], [[XOS Runtime]], [[Praxis Agents]] · #ROSTopic #HTTP #SettleDetection #VendorAbstraction #FSMOrchestration
 
-**Theme:** [[Robot Middleware Integration]] (5 shared) · [[Praxis Integration Toolchain]] (3 shared)
+**Theme:** [[ROS 2 Robotics Middleware]] (4 shared) · [[Robotics Integration Infrastructure]] (4 shared)
 
 ### Summary
 Shipped the most architecturally interesting node of the Q5 driver: `motion_replay_executor`, which fires the XOS HTTP runtime's recorded-motion endpoint and **blocks until the motion settles by watching `/joint_states`**, not by trusting the HTTP `200 OK`. The pattern — "settle by sensor feedback, never by RPC return" — is reusable for any robot whose motion library is HTTP-triggered fire-and-forget. Empirical exclusion list (wheel + left wrist + left hand) discovered after the naïve implementation never declared completion.
@@ -50,6 +48,6 @@ Shipped the most architecturally interesting node of the Q5 driver: `motion_repl
 
 ## Rolled up into
 
-[[2026-W25]]
+[[Agibot X2 and RobotEra Q5 Integration]]
 
 ---

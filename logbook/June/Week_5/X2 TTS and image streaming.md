@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 15-06-26
-  - 2026-06-15
+date: 2026-06-15
 ---
 
 # Daily
@@ -10,7 +8,7 @@ aliases:
 
 **Graph Nodes:** [[Agibot X2 Ultra]], [[Praxis Platform]], [[AIMDK]] · #ROS2 #FFmpeg #OpenCV #MediaMTX #Docker #tmuxinator #MQTT #H264 #MultithreadedExecutor #VendorAbstraction
 
-**Theme:** [[Praxis Integration Toolchain]] (9 shared) · [[Robotics Middleware Infrastructure]] (3 shared)
+**Theme:** [[Robotics Integration Infrastructure]] (5 shared) · [[ROS 2 Robotics Middleware]] (4 shared) · [[Video Streaming Infrastructure]] (4 shared)
 
 ### Summary
 Closed out X2 integration with a Praxis `tts` action executor (volume-set + play-with-priority chain) and a `sensor_msgs/Image` topic-based video streamer that's the cleanest of the three driver implementations — no V4L2, no GStreamer, just `cv_bridge` and FFmpeg. Cherry on top: tracked down why image frames were dropping under joint-state load to the single-threaded executor pinch point, fixed it the same way as yesterday's pose executor.
@@ -43,6 +41,6 @@ Closed out X2 integration with a Praxis `tts` action executor (volume-set + play
 
 ## Rolled up into
 
-[[2026-W25]]
+[[Agibot X2 and RobotEra Q5 Integration]]
 
 ---

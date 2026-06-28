@@ -7,6 +7,8 @@ let state = {
   log: { sessionId: null, insight: null },
   catchup: { sessionId: null, target: null, highlights: [] },
   rollup: { targetKey: null, sourceDates: [] },
+  biweekly: { sourceDates: [], anchorDate: null },
+  graphNodes: { proposed: [], resolved: [] },
 };
 
 // ---------- helpers ----------
@@ -116,8 +118,7 @@ async function logStart(terse = false) {
     show($("log-chat"));
     const thread = $("log-thread");
     bubble(thread, "user", dump);
-    if (r.done) { showLogPreview(r.preview, r.insight, r.topic); }
-    else { bubble(thread, "assistant", r.question); show($("log-answer-row")); $("log-answer").focus(); }
+    handleLogTurn(r, thread);
   } catch (e) { toast(e.message, "error"); }
   finally { setBusy(btn, false); }
 }
@@ -131,8 +132,7 @@ async function logAnswer() {
     bubble($("log-thread"), "user", ans);
     $("log-answer").value = "";
     const r = await api("/api/log/answer", { session_id: state.log.sessionId, answer: ans });
-    if (r.done) { hide($("log-answer-row")); showLogPreview(r.preview, r.insight, r.topic); }
-    else { bubble($("log-thread"), "assistant", r.question); $("log-answer").focus(); }
+    handleLogTurn(r, $("log-thread"));
   } catch (e) { toast(e.message, "error"); }
   finally { setBusy(btn, false); }
 }
@@ -142,13 +142,52 @@ async function logDone() {
   setBusy(btn, true, "Generating...");
   try {
     const r = await api("/api/log/done", { session_id: state.log.sessionId });
-    hide($("log-answer-row"));
-    showLogPreview(r.preview, r.insight, r.topic);
+    handleLogTurn(r, $("log-thread"));
   } catch (e) { toast(e.message, "error"); }
   finally { setBusy(btn, false); }
 }
 
-function showLogPreview(entry, insight, topic) {
+async function logGraphNodesAnswer() {
+  const ans = $("log-answer").value.trim() || "skip";
+  const btn = $("log-answer-btn");
+  setBusy(btn, true, "Classifying...");
+  try {
+    bubble($("log-thread"), "user", ans);
+    $("log-answer").value = "";
+    const r = await api("/api/log/graph_nodes", {
+      session_id: state.log.sessionId,
+      answer: ans === "skip" ? "" : ans,
+    });
+    handleLogTurn(r, $("log-thread"));
+  } catch (e) { toast(e.message, "error"); }
+  finally { setBusy(btn, false); }
+}
+
+function handleLogTurn(r, thread) {
+  if (r.done) {
+    hide($("log-answer-row"));
+    state.log.awaitingGraphNodes = false;
+    $("log-answer-btn").onclick = logAnswer;
+    showLogPreview(r.preview, r.insight, r.topic, r.graph_nodes);
+    return;
+  }
+  if (r.graph_nodes_question) {
+    state.log.awaitingGraphNodes = true;
+    bubble(thread, "assistant", r.graph_nodes_question);
+    show($("log-answer-row"));
+    $("log-answer").focus();
+    $("log-answer-btn").onclick = logGraphNodesAnswer;
+    return;
+  }
+  // Normal Q&A turn.
+  state.log.awaitingGraphNodes = false;
+  $("log-answer-btn").onclick = logAnswer;
+  bubble(thread, "assistant", r.question);
+  show($("log-answer-row"));
+  $("log-answer").focus();
+}
+
+function showLogPreview(entry, insight, topic, graphNodes) {
   $("log-preview-ta").value = entry;
   $("log-topic").value = topic || "";
   state.log.insight = insight;
@@ -156,26 +195,95 @@ function showLogPreview(entry, insight, topic) {
     show($("log-insight-block"));
     $("log-insight-ta").value = insight;
   } else { hide($("log-insight-block")); }
+  renderGraphNodes(graphNodes);
   show($("log-preview"));
+}
+
+function renderGraphNodes(gn) {
+  state.graphNodes = { proposed: (gn && gn.proposed) || [], resolved: (gn && gn.resolved) || [] };
+  const blk = $("log-graph-nodes-block");
+  if (!blk) return;
+  const proposed = state.graphNodes.proposed;
+  if (!proposed.length) {
+    hide(blk);
+    $("log-graph-nodes-list").innerHTML = "";
+    return;
+  }
+  const lines = proposed.map((p, i) => {
+    const aliases = (p.aliases || []).join(", ");
+    const aliasText = aliases ? ` <span class="hint">aliases: ${aliases}</span>` : "";
+    return `<label class="check"><input type="checkbox" data-prop-idx="${i}" checked> `
+      + `<code>${p.name}</code> <span class="hint">(${p.kind})</span>${aliasText}</label>`;
+  });
+  $("log-graph-nodes-list").innerHTML = lines.join("");
+  show(blk);
 }
 
 async function logSave() {
   const btn = $("log-save-btn");
   setBusy(btn, true, "Saving...");
   try {
+    const approved = [];
+    document.querySelectorAll('#log-graph-nodes-list input[type="checkbox"]').forEach((el) => {
+      if (el.checked) {
+        const p = state.graphNodes.proposed[Number(el.dataset.propIdx)];
+        if (p) approved.push(p);
+      }
+    });
     const body = {
       session_id: state.log.sessionId,
       edited_preview: $("log-preview-ta").value,
       save_insight: $("log-save-insight").checked,
       insight: $("log-insight-ta").value,
       topic: $("log-topic").value,
+      approved_proposals: approved,
     };
     const r = await api("/api/log/save", body);
     toast(`Saved: ${r.saved}` + (r.insight_saved ? ` + ${r.insight_saved}` : ""));
+    if (r.biweekly && r.biweekly.preview) {
+      showBiweeklyPreview(r.biweekly);
+    } else {
+      if (r.biweekly && r.biweekly.error) {
+        toast(`Biweekly preview failed: ${r.biweekly.error}`, "error");
+      }
+      resetLog();
+      await refreshToday();
+    }
+  } catch (e) { toast(e.message, "error"); }
+  finally { setBusy(btn, false); }
+}
+
+function showBiweeklyPreview(bw) {
+  state.biweekly.sourceDates = bw.source_dates || [];
+  state.biweekly.anchorDate = bw.cycle_anchor || null;
+  state.biweekly.topic = bw.topic || "";
+  $("biweekly-preview-ta").value = bw.preview;
+  show($("biweekly-preview"));
+}
+
+async function biweeklySave() {
+  const btn = $("biweekly-save-btn");
+  setBusy(btn, true, "Saving...");
+  try {
+    const r = await api("/api/rollup/save", {
+      target_key: "biweekly",
+      edited_preview: $("biweekly-preview-ta").value,
+      source_dates: state.biweekly.sourceDates,
+      anchor_date: state.biweekly.anchorDate,
+      topic: state.biweekly.topic,
+    });
+    toast(`Saved: ${r.saved}`);
+    biweeklyReset();
     resetLog();
     await refreshToday();
   } catch (e) { toast(e.message, "error"); }
   finally { setBusy(btn, false); }
+}
+
+function biweeklyReset() {
+  state.biweekly = { sourceDates: [], anchorDate: null };
+  $("biweekly-preview-ta").value = "";
+  hide($("biweekly-preview"));
 }
 
 async function logCancel() {
@@ -187,13 +295,17 @@ async function logCancel() {
 }
 
 function resetLog() {
-  state.log = { sessionId: null, insight: null };
+  state.log = { sessionId: null, insight: null, awaitingGraphNodes: false };
+  state.graphNodes = { proposed: [], resolved: [] };
   $("log-dump").value = "";
   $("log-answer").value = "";
   $("log-thread").innerHTML = "";
+  $("log-answer-btn").onclick = logAnswer;
   hide($("log-chat"));
   hide($("log-answer-row"));
   hide($("log-preview"));
+  hide($("log-graph-nodes-block"));
+  $("log-graph-nodes-list").innerHTML = "";
   show($("log-start"));
 }
 
@@ -203,6 +315,8 @@ $("log-answer-btn").onclick = logAnswer;
 $("log-done-btn").onclick = logDone;
 $("log-save-btn").onclick = logSave;
 $("log-cancel-btn").onclick = logCancel;
+$("biweekly-save-btn").onclick = biweeklySave;
+$("biweekly-discard-btn").onclick = biweeklyReset;
 $("log-answer").addEventListener("keydown", (e) => {
   if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); logAnswer(); }
 });
@@ -226,6 +340,7 @@ $("rollup-run-btn").onclick = async () => {
     const r = await api("/api/rollup", body);
     state.rollup.targetKey = r.target_key;
     state.rollup.sourceDates = r.source_dates || [];
+    state.rollup.topic = r.topic || "";
     $("rollup-preview-ta").value = r.preview;
     status($("rollup-status"), `Synthesized ${r.entry_count} daily entries from ${r.period}.`, "ok");
     show($("rollup-preview"));
@@ -241,6 +356,7 @@ $("rollup-save-btn").onclick = async () => {
       target_key: state.rollup.targetKey,
       edited_preview: $("rollup-preview-ta").value,
       source_dates: state.rollup.sourceDates,
+      topic: state.rollup.topic,
     });
     toast(`Saved: ${r.saved}`);
     hide($("rollup-preview"));
