@@ -448,9 +448,22 @@ def _template_has_topic(template):
     return "{topic}" in template
 
 
-def _render_template(template, when, cfg=None, topic=None):
-    """Render a path template against the {date}/{month}/{week}/{topic} keys."""
-    args = _path_format_args(when, cfg=cfg, topic=slugify_topic(topic) if topic else "")
+def _render_template(template, when, cfg=None, topic=None, target_key=None):
+    """Render a path template against the {date}/{month}/{week}/{topic} keys.
+
+    If the template uses `{topic}` and no topic is supplied, falls back to
+    `rollup_stem(target_key, when, cfg)` so weeklies/biweeklies still get a
+    sensible name (e.g. "Weekly_W4") rather than an empty filename.
+    """
+    if topic:
+        rendered_topic = slugify_topic(topic)
+    else:
+        rendered_topic = ""
+        if target_key and "{topic}" in template:
+            fallback = rollup_stem(target_key, when, cfg)
+            if fallback:
+                rendered_topic = fallback
+    args = _path_format_args(when, cfg=cfg, topic=rendered_topic)
     return template.format(**args).rstrip()
 
 
@@ -467,15 +480,15 @@ def resolve_target_path(cfg, target_key, when=None, topic=None):
 
     if _template_has_topic(template):
         if topic:
-            return vault_path(cfg, _render_template(template, when, cfg, topic))
+            return vault_path(cfg, _render_template(template, when, cfg, topic, target_key))
         found = find_existing_target_path(cfg, target_key, when)
         if found is not None:
             return found
-        # No existing entry, no topic — return a date-only placeholder so
-        # `.exists()` returns False without raising on the format call.
-        return vault_path(cfg, _render_template(template, when, cfg, topic=""))
+        # No existing entry, no topic — fall back to the target's stem name
+        # (e.g. "Weekly_W4") via _render_template's target_key path.
+        return vault_path(cfg, _render_template(template, when, cfg, topic="", target_key=target_key))
 
-    return vault_path(cfg, _render_template(template, when, cfg))
+    return vault_path(cfg, _render_template(template, when, cfg, target_key=target_key))
 
 
 def find_existing_target_path(cfg, target_key, when=None):
@@ -493,15 +506,24 @@ def find_existing_target_path(cfg, target_key, when=None):
     when = when or date.today()
     template = cfg["targets"][target_key]["path"]
     if not _template_has_topic(template):
-        path = vault_path(cfg, _render_template(template, when, cfg))
+        path = vault_path(cfg, _render_template(template, when, cfg, target_key=target_key))
         return path if path.exists() else None
 
-    placeholder = vault_path(cfg, _render_template(template, when, cfg, topic=""))
+    placeholder = vault_path(cfg, _render_template(template, when, cfg, topic="", target_key=target_key))
     parent = placeholder.parent
     if not parent.exists():
         return None
 
-    needles = (when.isoformat(), when.strftime("%d-%m-%y"))
+    # When the target is `daily` we only want daily files; otherwise we'd
+    # match the weekly that happens to live in the same folder.
+    if target_key == "daily":
+        needles = (when.isoformat(), when.strftime("%d-%m-%y"))
+    else:
+        # For weekly/biweekly/etc the alias set is the rollup_stem family —
+        # e.g. Weekly_W6, 2026-W27. We don't currently use this branch for
+        # date-driven lookups, so fall back to no needles (returns None).
+        needles = ()
+
     for p in sorted(parent.glob("*.md")):
         # Cheap frontmatter scan: read up to ~20 lines and look for our date.
         try:
@@ -511,19 +533,25 @@ def find_existing_target_path(cfg, target_key, when=None):
             continue
         if not head.startswith("---"):
             continue
+        # Primary: a `date: YYYY-MM-DD` field (used by post-graph-cleanup
+        # dailies — no aliases, but a non-graph date field for lookup).
+        if f"date: {when.isoformat()}" in head:
+            return p
+        # Legacy: alias-list form `- YYYY-MM-DD` / `- DD-MM-YY`.
         for needle in needles:
             if f"- {needle}" in head:
                 return p
 
-    # Legacy fallback: filename prefix glob.
-    prefixes = [
-        when.strftime("%d-%m-%y"),
-        when.strftime("%Y-%m-%d"),
-    ]
-    for prefix in prefixes:
-        matches = sorted(parent.glob(f"{prefix}*.md"))
-        if matches:
-            return matches[0]
+    # Legacy fallback: filename prefix glob (only meaningful for daily).
+    if target_key == "daily":
+        prefixes = [
+            when.strftime("%d-%m-%y"),
+            when.strftime("%Y-%m-%d"),
+        ]
+        for prefix in prefixes:
+            matches = sorted(parent.glob(f"{prefix}*.md"))
+            if matches:
+                return matches[0]
     return None
 
 
@@ -559,17 +587,11 @@ def write_target(cfg, target_key, content, when=None, force_mode=None, topic=Non
     mode = force_mode or cfg["targets"][target_key].get("mode", "append")
     header = f"## {when.strftime('%B %d, %Y')}"
 
+    # A `date:` frontmatter field lets find_existing_target_path locate the
+    # right file by date without polluting the graph with date-alias nodes.
     frontmatter = ""
     if uses_topic:
-        # Aliases let date-shaped wikilinks ([[YYYY-MM-DD]] or [[DD-MM-YY]])
-        # still resolve to a topic-named file. Both forms are recorded.
-        frontmatter = (
-            "---\n"
-            "aliases:\n"
-            f"  - {when.isoformat()}\n"
-            f"  - {when.strftime('%d-%m-%y')}\n"
-            "---\n\n"
-        )
+        frontmatter = f"---\ndate: {when.isoformat()}\n---\n\n"
 
     if mode == "amend":
         title = target_key.replace("_", " ").title()
@@ -758,11 +780,17 @@ def link_rollup_to_dailies(cfg, target_key, dailies, when=None):
     if not stem:
         return
 
+    # Resolve each daily's actual filename stem so wikilinks point at the
+    # semantic name (no date nodes in the graph).
+    daily_stems = []
+    for d, _ in dailies:
+        dp = resolve_target_path(cfg, "daily", d)
+        if dp.exists():
+            daily_stems.append((d, dp, dp.stem))
+
     rollup_path = resolve_target_path(cfg, target_key, when)
     if rollup_path.exists():
-        # New layout uses DD-MM-YY filenames; the legacy YYYY-MM-DD alias is
-        # carried in the daily's frontmatter for backwards compatibility.
-        links = " ".join(f"[[{d.strftime('%d-%m-%y')}]]" for d, _ in dailies)
+        links = " ".join(f"[[{stem_}]]" for _, _, stem_ in daily_stems)
         block = f"\n## Source dailies\n\n{links}\n"
         existing = rollup_path.read_text()
         if "## Source dailies" not in existing:
@@ -770,8 +798,7 @@ def link_rollup_to_dailies(cfg, target_key, dailies, when=None):
                 f.write(block)
 
     rollup_link = f"[[{stem}]]"
-    for d, _ in dailies:
-        daily_path = resolve_target_path(cfg, "daily", d)
+    for d, daily_path, _ in daily_stems:
         if not daily_path.exists():
             continue
         existing = daily_path.read_text()
@@ -1448,12 +1475,23 @@ def generate_biweekly_preview(client, model, cfg, framing, when):
             {"role": "user", "content": f"Daily entries:\n\n{concat}\n\n{generation}"},
         ],
     )
+    preview = response.content[0].text
+
+    # Pick a topic for the biweekly's filename if the target uses {topic}.
+    topic = ""
+    if "{topic}" in cfg["targets"]["biweekly"].get("path", ""):
+        try:
+            topic = pick_topic(client, model, preview)
+        except Exception:
+            topic = ""
+
     return {
-        "preview": response.content[0].text,
+        "preview": preview,
         "source_dates": [d.isoformat() for d, _ in entries],
         "target_key": "biweekly",
         "period": period_label,
         "cycle_anchor": cycle_end.isoformat(),
+        "topic": topic,
     }
 
 
