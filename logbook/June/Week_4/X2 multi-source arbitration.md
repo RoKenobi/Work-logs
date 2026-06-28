@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 12-06-26
-  - 2026-06-12
+date: 2026-06-12
 ---
 
 # Daily
@@ -46,6 +44,6 @@ Started the Agibot X2 Ultra integration — a bipedal humanoid whose locomotion 
 
 ## Rolled up into
 
-[[2026-W25]]
+[[Agibot X2 and RobotEra Q5 Integration]]
 
 ---

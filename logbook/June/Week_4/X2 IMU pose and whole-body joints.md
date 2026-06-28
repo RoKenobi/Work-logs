@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 13-06-26
-  - 2026-06-13
+date: 2026-06-13
 ---
 
 # Daily
@@ -42,6 +40,6 @@ Built the X2's IMU-fused dead-reckoning executor and the whole-body joint aggreg
 
 ## Rolled up into
 
-[[2026-W25]]
+[[Agibot X2 and RobotEra Q5 Integration]]
 
 ---

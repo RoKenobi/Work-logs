@@ -1,7 +1,4 @@
 ---
-aliases:
-  - Weekly_W6
-  - 2026-W27
 ---
 
 # Weekly
@@ -49,7 +46,7 @@ Shipped the agentic layer that sits on top of the multi-robot integration work f
 
 ## Source dailies
 
-[[22-06-26]] · [[23-06-26]] · [[24-06-26]] · [[25-06-26]] · [[26-06-26]]
+[[Gemma E4B vLLM bring-up]] · [[Gemma 26B on Blackwell]] · [[impact_agent ADK build]] · [[Prompt and integration debug]] · [[Fallen boxes live demo]]
 
 - [ ] Obtain supervisor clearance for confidentiality before submitting
 

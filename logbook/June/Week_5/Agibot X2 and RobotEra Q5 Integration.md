@@ -1,7 +1,4 @@
 ---
-aliases:
-  - Weekly_W5
-  - 2026-W25
 ---
 
 # Weekly
@@ -53,7 +50,7 @@ Shipped two complete humanoid integrations end-to-end: Agibot X2 Ultra (bipedal,
 
 ## Source dailies
 
-[[2026-06-12]] [[2026-06-13]] [[2026-06-15]] [[2026-06-17]] [[2026-06-18]] [[2026-06-19]]
+[[X2 multi-source arbitration]] [[X2 IMU pose and whole-body joints]] [[X2 TTS and image streaming]] [[Q5 FSM and CycloneDDS]] [[Q5 TwistStamped and dead-reckoning]] [[Q5 motion replay settle detection]]
 
 - [ ] Obtain supervisor clearance for confidentiality before submitting
 

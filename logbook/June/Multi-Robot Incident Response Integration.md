@@ -1,8 +1,4 @@
 ---
-aliases:
-  - Biweekly_W5-W6
-  - 2026-W26-W27
-  - Biweekly_W5_W6
 ---
 
 # Biweekly
@@ -51,7 +47,7 @@ Two-week arc closing out the Praxis multi-robot integration story. **Week 5 (Jun
 
 ## Source dailies
 
-[[15-06-26]] · [[17-06-26]] · [[18-06-26]] · [[19-06-26]] · [[22-06-26]] · [[23-06-26]] · [[24-06-26]] · [[25-06-26]] · [[26-06-26]]
+[[X2 TTS and image streaming]] · [[Q5 FSM and CycloneDDS]] · [[Q5 TwistStamped and dead-reckoning]] · [[Q5 motion replay settle detection]] · [[Gemma E4B vLLM bring-up]] · [[Gemma 26B on Blackwell]] · [[impact_agent ADK build]] · [[Prompt and integration debug]] · [[Fallen boxes live demo]]
 
 - [ ] Obtain supervisor clearance for confidentiality before submitting
 

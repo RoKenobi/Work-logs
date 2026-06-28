@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 11-06-26
-  - 2026-06-11
+date: 2026-06-11
 ---
 
 # Daily
@@ -50,6 +48,6 @@ Resolved the two remaining blockers to A2 production readiness: the AIMDK-vs-Pra
 
 ## Rolled up into
 
-[[2026-W24]]
+[[Agibot A2 Ultra ROS2 Integration]]
 
 ---

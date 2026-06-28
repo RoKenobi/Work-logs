@@ -1,7 +1,4 @@
 ---
-aliases:
-  - Weekly_W4
-  - 2026-W24
 ---
 
 # Weekly
@@ -45,7 +42,7 @@ Shipped the Agibot A2 Ultra end-to-end into Praxis: a six-node ROS 2 driver atop
 
 ## Source dailies
 
-[[2026-06-08]] [[2026-06-09]] [[2026-06-10]] [[2026-06-11]]
+[[A2 systemd substrate]] [[A2 discrete dead-reckoning]] [[A2 BMS service and QoS]] [[A2 map-id and FastDDS profile]]
 
 - [ ] Obtain supervisor clearance for confidentiality before submitting
 

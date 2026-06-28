@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 08-06-26
-  - 2026-06-08
+date: 2026-06-08
 ---
 
 # Daily
@@ -46,6 +44,6 @@ Stood up the on-board service substrate for the Agibot A2 Ultra integration — 
 
 ## Rolled up into
 
-[[2026-W24]]
+[[Agibot A2 Ultra ROS2 Integration]]
 
 ---

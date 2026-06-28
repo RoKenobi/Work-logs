@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 09-06-26
-  - 2026-06-09
+date: 2026-06-09
 ---
 
 # Daily
@@ -45,6 +43,6 @@ Authored the flagship node of the A2 driver — `translate_and_rotate_executor` 
 
 ## Rolled up into
 
-[[2026-W24]]
+[[Agibot A2 Ultra ROS2 Integration]]
 
 ---

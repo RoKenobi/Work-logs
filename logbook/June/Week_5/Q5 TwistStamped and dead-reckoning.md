@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 18-06-26
-  - 2026-06-18
+date: 2026-06-18
 ---
 
 # Daily
@@ -46,6 +44,6 @@ Shipped the Q5 navigation stack: SE(2) dead-reckoning executor (same algebra as 
 
 ## Rolled up into
 
-[[2026-W25]]
+[[Agibot X2 and RobotEra Q5 Integration]]
 
 ---

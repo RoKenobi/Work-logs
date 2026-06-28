@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 10-06-26
-  - 2026-06-10
+date: 2026-06-10
 ---
 
 # Daily
@@ -48,6 +46,6 @@ Closed out the A2 sensor-side bring-up: BMS health publisher with unit-normalisa
 
 ## Rolled up into
 
-[[2026-W24]]
+[[Agibot A2 Ultra ROS2 Integration]]
 
 ---

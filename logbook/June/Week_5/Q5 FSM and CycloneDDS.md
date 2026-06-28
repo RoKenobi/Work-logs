@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 17-06-26
-  - 2026-06-17
+date: 2026-06-17
 ---
 
 # Daily
@@ -42,6 +40,6 @@ Started the RobotEra Q5 humanoid driver and tracked down two distinct "publishes
 
 ## Rolled up into
 
-[[2026-W25]]
+[[Agibot X2 and RobotEra Q5 Integration]]
 
 ---

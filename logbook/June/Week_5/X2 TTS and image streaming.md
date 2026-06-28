@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 15-06-26
-  - 2026-06-15
+date: 2026-06-15
 ---
 
 # Daily
@@ -43,6 +41,6 @@ Closed out X2 integration with a Praxis `tts` action executor (volume-set + play
 
 ## Rolled up into
 
-[[2026-W25]]
+[[Agibot X2 and RobotEra Q5 Integration]]
 
 ---

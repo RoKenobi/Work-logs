@@ -1,7 +1,4 @@
 ---
-aliases:
-  - Biweekly_W1-W2
-  - 2026-W26
 ---
 
 # Biweekly
@@ -105,4 +102,4 @@ Praxis is the convergence point: every robot speaks its proprietary protocol loc
 
 ## Source dailies
 
-[[2026-05-22]] [[2026-05-30]] [[2026-06-02]] [[2026-06-04]]
+[[Q5 data collection bring-up]] [[SE(2) dead-reckoning bug]] [[RTSP auth fix]] [[2026-06-04]]

@@ -1,7 +1,5 @@
 ---
-aliases:
-  - 19-06-26
-  - 2026-06-19
+date: 2026-06-19
 ---
 
 # Daily
@@ -50,6 +48,6 @@ Shipped the most architecturally interesting node of the Q5 driver: `motion_repl
 
 ## Rolled up into
 
-[[2026-W25]]
+[[Agibot X2 and RobotEra Q5 Integration]]
 
 ---
