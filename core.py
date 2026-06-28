@@ -533,6 +533,11 @@ def find_existing_target_path(cfg, target_key, when=None):
             continue
         if not head.startswith("---"):
             continue
+        # Primary: a `date: YYYY-MM-DD` field (used by post-graph-cleanup
+        # dailies — no aliases, but a non-graph date field for lookup).
+        if f"date: {when.isoformat()}" in head:
+            return p
+        # Legacy: alias-list form `- YYYY-MM-DD` / `- DD-MM-YY`.
         for needle in needles:
             if f"- {needle}" in head:
                 return p
@@ -582,17 +587,11 @@ def write_target(cfg, target_key, content, when=None, force_mode=None, topic=Non
     mode = force_mode or cfg["targets"][target_key].get("mode", "append")
     header = f"## {when.strftime('%B %d, %Y')}"
 
+    # A `date:` frontmatter field lets find_existing_target_path locate the
+    # right file by date without polluting the graph with date-alias nodes.
     frontmatter = ""
     if uses_topic:
-        # Aliases let date-shaped wikilinks ([[YYYY-MM-DD]] or [[DD-MM-YY]])
-        # still resolve to a topic-named file. Both forms are recorded.
-        frontmatter = (
-            "---\n"
-            "aliases:\n"
-            f"  - {when.isoformat()}\n"
-            f"  - {when.strftime('%d-%m-%y')}\n"
-            "---\n\n"
-        )
+        frontmatter = f"---\ndate: {when.isoformat()}\n---\n\n"
 
     if mode == "amend":
         title = target_key.replace("_", " ").title()
@@ -781,11 +780,17 @@ def link_rollup_to_dailies(cfg, target_key, dailies, when=None):
     if not stem:
         return
 
+    # Resolve each daily's actual filename stem so wikilinks point at the
+    # semantic name (no date nodes in the graph).
+    daily_stems = []
+    for d, _ in dailies:
+        dp = resolve_target_path(cfg, "daily", d)
+        if dp.exists():
+            daily_stems.append((d, dp, dp.stem))
+
     rollup_path = resolve_target_path(cfg, target_key, when)
     if rollup_path.exists():
-        # New layout uses DD-MM-YY filenames; the legacy YYYY-MM-DD alias is
-        # carried in the daily's frontmatter for backwards compatibility.
-        links = " ".join(f"[[{d.strftime('%d-%m-%y')}]]" for d, _ in dailies)
+        links = " ".join(f"[[{stem_}]]" for _, _, stem_ in daily_stems)
         block = f"\n## Source dailies\n\n{links}\n"
         existing = rollup_path.read_text()
         if "## Source dailies" not in existing:
@@ -793,8 +798,7 @@ def link_rollup_to_dailies(cfg, target_key, dailies, when=None):
                 f.write(block)
 
     rollup_link = f"[[{stem}]]"
-    for d, _ in dailies:
-        daily_path = resolve_target_path(cfg, "daily", d)
+    for d, daily_path, _ in daily_stems:
         if not daily_path.exists():
             continue
         existing = daily_path.read_text()
