@@ -116,6 +116,76 @@ def api_log_start():
     })
 
 
+@app.post("/api/log/upload")
+def api_log_upload():
+    """Body: { files: [{name, content}, ...], date: "YYYY-MM-DD", run_qa: bool, framing? }
+
+    Treats uploaded .md / .txt files as the brain-dump for a daily on a
+    user-picked date. Files are concatenated with `## <filename>` separators
+    into one input. If `run_qa` is True, follow-ups run; otherwise we jump
+    straight to the Graph Nodes question + generation.
+    """
+    data = request.get_json(force=True)
+    files = data.get("files") or []
+    if not files:
+        return jsonify({"error": "at least one file required"}), 400
+
+    try:
+        when = datetime.strptime(data["date"], "%Y-%m-%d").date()
+    except (ValueError, KeyError):
+        return jsonify({"error": "valid `date` (YYYY-MM-DD) required"}), 400
+
+    framing = data.get("framing") or CFG["defaults"]["framing"]
+    target = "daily"
+    existing = core.read_existing_entry(CFG, target, when=when)
+    mode = "amend" if existing else "fresh"
+
+    # Concatenate file contents with named separators so the LLM can attribute
+    # technical detail back to a source document.
+    parts = []
+    for f in files:
+        name = (f.get("name") or "uploaded").strip() or "uploaded"
+        content = f.get("content") or ""
+        if not content.strip():
+            continue
+        parts.append(f"## {name}\n\n{content.strip()}")
+    if not parts:
+        return jsonify({"error": "all uploaded files were empty"}), 400
+    brain_dump = "\n\n---\n\n".join(parts)
+
+    sid = _new_session("log", framing, target, {
+        "existing": existing,
+        "when": when,
+    })
+    sess = SESSIONS[sid]
+    sess["messages"].append({
+        "role": "user",
+        "content": (
+            f"I'm submitting work for {when.isoformat()}. The following are "
+            f"engineering reports / notes from that day:\n\n{brain_dump}"
+        ),
+    })
+
+    # No Q&A → straight to the Graph Nodes question (or finalize).
+    if not data.get("run_qa"):
+        return _ask_graph_nodes_or_finalize(sid)
+
+    assistant_text = core.ask_next_question(
+        CLIENT, MODEL, _system_for(sess), sess["messages"],
+    )
+    if QUESTIONS_COMPLETE in assistant_text:
+        return _ask_graph_nodes_or_finalize(sid)
+
+    sess["messages"].append({"role": "assistant", "content": assistant_text})
+    return jsonify({
+        "session_id": sid,
+        "done": False,
+        "question": assistant_text,
+        "mode": mode,
+        "when": when.isoformat(),
+    })
+
+
 @app.post("/api/log/answer")
 def api_log_answer():
     """Body: { session_id, answer }."""
@@ -283,8 +353,9 @@ def api_log_save():
         approved_added.append(p["name"])
 
     topic = (data.get("topic") or "").strip()
-    path = core.write_target(CFG, sess["target"], entry, topic=topic or None)
-    core.save_raw_input(CFG, sess["messages"], kind="log")
+    when = sess.get("when")  # set by upload flow; None falls back to today
+    path = core.write_target(CFG, sess["target"], entry, when=when, topic=topic or None)
+    core.save_raw_input(CFG, sess["messages"], kind="log", when=when)
 
     insight_path = None
     if data.get("save_insight") and data.get("insight"):
@@ -297,11 +368,11 @@ def api_log_save():
     # fires mid-cycle.
     biweekly = None
     if sess["target"] == "daily":
-        when = date.today()
-        if when == core.last_workday_of_cycle(when, CFG):
+        biweekly_when = when or date.today()
+        if biweekly_when == core.last_workday_of_cycle(biweekly_when, CFG):
             try:
                 biweekly = core.generate_biweekly_preview(
-                    CLIENT, MODEL, CFG, sess["framing"], when,
+                    CLIENT, MODEL, CFG, sess["framing"], biweekly_when,
                 )
             except Exception as e:
                 # Never let biweekly failure block the daily save.
