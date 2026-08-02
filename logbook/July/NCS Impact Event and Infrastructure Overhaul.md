@@ -1,0 +1,50 @@
+# Biweekly
+
+## July 10, 2026
+
+### Summary
+Two-week arc from June 29 through July 9 (W7 + W8) — the final sprint into and through the NCS Impact 2026 public event at MBS Level 5. Week 7 delivered the fleet management dashboard (one-tap phone control), the Hikvision CCTV Praxis driver, a full TP-Link Omada enterprise network migration, and CEO sign-off on the final incident-response scenario. Week 8 was the event itself: NovaSonic speech-to-speech integration, a DFS-channel network crisis solved on setup day, late-night robot speech choreography, and three days of public demonstrations to NCS internal staff and C-suite/executive audiences — all without demo failures. The conversational X2 was the most-remarked element by non-technical visitors. Eight weeks of integration work delivered under live event conditions.
+
+### Shipped
+- **`fleet-dashboard`** (Jun 29) — FastAPI phone-friendly app on `robotics-3gyc:9191`, one-tap Start / Kill / Set-Pose fanning out to all three robots in parallel via `asyncio.gather()` over SSH + Praxis HTTP. Multi-host probe for X2's floating DHCP lease. systemd unit for auto-start.
+- **`praxis_hk_vision` CCTV driver** (Jun 29) — first non-robot Praxis driver. Plain Python (no ROS 2), OpenCV/FFmpeg RTSP capture from Hikvision at `192.168.123.100`, `robot_status` + `robot_pose` published to the Praxis platform. Floor-plan pin at `(6.797, -0.168)` on the `floor_plan` frame (vs the `robot_map` frame — a subtle but breaking distinction discovered by reading the floor-plan viewer's JS). `set_pose` action deliberately omitted: a wall-mounted camera's location is a deploy property, not a runtime property.
+- **TP-Link Omada enterprise network migration** (Jul 3) — full fleet migration from ad-hoc robot-AP topology to dedicated EAPs per robot zone on the Omada SDN controller. Eliminates crowd-induced RF congestion. X2 floating IP resolved via MAC reservation. RTSP auth webhook IP updated post-migration. All robots + CCTV + server validated simultaneously.
+- **NovaSonic speech-to-speech on Q5** (Jul 6) — extended with NCS event knowledge base, Singapore LTA + OneMap API integration, event-appropriate prompt context. Full spoken conversation with Q5 at ~3–5 s end-to-end latency.
+- **Fast Whisper speech recognition on spare X2** (Jul 6–8) — Fast Whisper ASR → NovaSonic/Gemma LLM → TTS pipeline. Conversational X2 running at the event from Day 1.
+- **Robot speech choreography for the incident scenario** (Jul 7 night) — Go2: siren + verbal incident confirmation; X2: crowd announcement + casualty-check narration; Q5: kit-retrieval and navigation confirmation. Prompt v4 deployed same night via hot-reload.
+- **NCS Impact 2026 public demonstration** (Jul 7–9) — multiple fallen-boxes scenario runs for NCS internal staff and C-suite/external executives/professors. Zero failures on main demo day. CommanderAI as the booth's public interface.
+
+### Technical Highlights
+- **Fleet dashboard's five-step `praxis_start` saga.** A `bash -ic` invocation (to load `.bashrc` and expand aliases), `-tt` SSH flag (TTY for tmuxinator), `--no-attach` (to prevent SSH blocking on the new tmux session), and Q5's GL-MT3000 port-forward (`192.168.123.166:2222`) each failed in sequence and were fixed in sequence. Each hidden environment dependency revealed only when the previous one was resolved.
+- **CCTV driver's floor-plan viewer three implicit contracts.** Topic name must be `robot_pose` (not a custom per-device topic); frame type must be `floor_plan` (not `robot_map` — distinct UUID namespaces); pose must be re-published every ≤10 s (the viewer discards entries older than 10 s). All three discovered by reading `floor_plan_viewer.js` directly — none documented.
+- **DFS (802.11h) as a venue deployment footgun.** APs appeared connected in the Omada controller but passed zero traffic for hours. Root cause: DFS radar-scan windows silenced channels repeatedly in the MBS venue RF environment. One config change (DFS: off) resolved it immediately. Lesson: venue deployments must pre-validate DFS; "connected in controller" ≠ "traffic flowing."
+- **Robot speech as a narrative UX layer over the agentic loop.** The agentic orchestration was unchanged — same Praxis actions, same prompt, same MQTT/RTSP plumbing. Adding speech (verbal confirmations, X2–Q5 synthetic dialogue, Go2 siren) made the scenario intelligible to any audience. The empirical proof: the boss's boss's feedback ("it feels like nothing") before speech vs C-suite engagement after. Interpretability is as important as capability.
+- **Staged confidence (50→75→95) as both a technical mechanism and a communication tool.** Multi-sensor Bayesian evidence accumulation as the technical design choice; the dashboard's real-time confidence trace as the C-suite explanation that required zero words. The most common executive question ("how does it know when to escalate?") was answered visually by the trace.
+- **"Keep robots powered on all day" as an architectural insight.** Robots maintain network state (Wi-Fi association, MQTT session, RTSP stream) as long as powered. Rebooting destroys all three simultaneously. The operational rule is the event-deployment analogue of "prefer graceful restarts over hard reboots."
+- **Fast Whisper + NovaSonic + Gemma 26B as a live conversational stack.** Pipeline: ASR ~500 ms, LLM inference 1–3 s (bottleneck), TTS ~300 ms. Total ~4–6 s — at the edge of conversational comfort. External API calls (LTA, OneMap) add <200 ms on LAN. Local vLLM guaranteed latency stability regardless of venue internet congestion.
+- **The vendor-agnostic abstraction validated at demo scale.** `impact_agent` dispatched Go2, X2, and Q5 through identical Praxis action schemas — three vendors, three SDKs, three locomotion API models, one platform surface. CommanderAI expressed this as "type a sentence, all robots respond." The abstraction held under live event conditions in front of Singapore's technology leadership.
+
+### Impact
+- **NCS Impact 2026 delivered without demo failures.** Four robots, one CCTV, two LLM pipelines, one Praxis platform, one public event. C-suite, professors, company representatives, and NCS leadership all witnessed the fleet operating agentically.
+- **Fleet management operationally simple.** One phone bookmark, three buttons. `praxis_start`/`praxis_kill` aliases per robot. TP-Link Omada providing stable, crowd-immune connectivity. The operational complexity of the June demo (three SSH sessions, sequential bash script) has been replaced by a single FastAPI endpoint with `asyncio.gather()`.
+- **Conversational X2 was the event's most democratising element.** Queues throughout both days, multiple executive and professor follow-ups, most-remarked booth element. The Fast Whisper + NovaSonic + Gemma stack assembled under three days of time pressure.
+- **Enterprise network as a prerequisite validated.** The TP-Link Omada migration was the correct call. The DFS issue at MBS would have been catastrophic on the old robot-AP setup. On the new topology it was a 10-minute Omada controller fix.
+- **Two new dynamic scenarios in the repertoire** (Joe, Jul 3) — bag detection from robot cameras, perimeter enforcement (X2 walking toward and warning people who enter the carpet zone). Both use existing Praxis primitives composed in new ways. The incident-response template generalises.
+- **Eight weeks of integration work survived a live public event.** Every component shipped over the internship — drivers, SDK abstractions, agent prompts, network infrastructure, vLLM, speech pipelines — operated correctly under event conditions. That is the outcome the architecture was designed for.
+
+### Academic Connections
+- **Networking / RF.** DDS/Wi-Fi association state persistence as an operational reliability mechanism; DFS (802.11h) channel management in venue deployments; enterprise SDN for high-density RF environments; MAC-reservation-based static IP assignment.
+- **Distributed systems.** Multi-plane correlated failure eliminated by topology redesign; fan-out concurrency (`asyncio.gather()`) for I/O-bound parallel SSH/HTTP; `asyncio.wait_for()` + `run_in_executor()` for mixed sync/async boundaries; RTSP auth webhook as a hardcoded-IP migration footgun (second instance this internship).
+- **AI agents / orchestration.** Recipe-style prompts for Gemma under live demo conditions; same-turn TTS sequencing for synthetic multi-robot dialogue; staged-verification confidence as correctness mechanism and communication tool; local LLM as a no-internet-dependency reliability primitive.
+- **AI / NLP.** Fast Whisper as an optimised ASR layer; speech-to-speech pipeline latency decomposition; knowledge-base injection + live API grounding for conversational robots; vLLM inference throughput as the bottleneck at conversational latency targets.
+- **Human-factors / demo design.** Interpretability as a design requirement; verbal cues + confidence traces + UI as the communication layer over the technical layer; accessible conversational interfaces vs impressive technical demos for different audience segments.
+- **Software architecture.** Facade pattern (CommanderAI); hot-reload via volume mount; vendor-agnostic SDK abstraction validated at public-event scale; plain-Python (non-ROS-2) driver as the right shape for stationary sensor devices.
+- **Operational engineering.** "Robots stay on all day" as an event-deployment architectural rule; DFS pre-validation as a venue-deployment checklist item; keep-alive over reconnect-on-demand for live-event reliability.
+
+## Source dailies
+
+[[Fleet dashboard one-tap control]] · [[HK Vision CCTV driver]] · [[Network upgrade planning]] · [[Cisco TP-Link consultations and CommanderAI]] · [[CEO sign-off and scenario finalization]] · [[TP-Link migration and dynamic scenarios]] · [[NovaSonic speech-to-speech and event prep]] · [[NCS Impact setup day and late night prompt work]] · [[NCS Impact day 1 and X2 speech fixed]] · [[NCS Impact day 2 C-suite demos and pack-out]]
+
+- [ ] Obtain supervisor clearance for confidentiality before submitting
+
+---

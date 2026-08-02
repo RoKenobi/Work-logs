@@ -551,3 +551,46 @@ entities:
   - Blackwell workstation
   parent: ''
   description: NVIDIA Blackwell-architecture GPU; CUDA Error 803 host
+- name: TP-Link Omada
+  kind: platform
+  aliases:
+  - TP-Link
+  - Omada
+  - Omada SDN
+  - omada
+  parent: ''
+  description: Enterprise Wi-Fi SDN platform with on-premises controller
+- name: Cisco Meraki
+  kind: platform
+  aliases:
+  - Cisco
+  - Meraki
+  parent: ''
+  description: Cloud-managed enterprise Wi-Fi (evaluated, not selected)
+- name: CommanderAI
+  kind: platform
+  aliases:
+  - Commander AI
+  - commanderAI
+  parent: Praxis Platform
+  description: 'Demo showcase webpage: live robot status, natural-language command, scenario trigger panel'
+- name: NovaSonic
+  kind: software
+  aliases:
+  - novasonic
+  - nova sonic
+  description: Speech-to-speech pipeline deployed on Q5 and X2 for conversational robot interaction
+- name: Fast Whisper
+  kind: software
+  aliases:
+  - fastwhisper
+  - fast-whisper
+  - Whisper
+  description: Optimised Whisper ASR model for real-time speech recognition on the X2
+- name: NCS Impact 2026
+  kind: platform
+  aliases:
+  - NCS Impact
+  - Impact event
+  - impact 2026
+  description: NCS public technology showcase event, MBS Level 5, 7–9 July 2026

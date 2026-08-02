@@ -123,6 +123,39 @@ async function logStart(terse = false) {
   finally { setBusy(btn, false); }
 }
 
+async function logUpload() {
+  const dateEl = $("log-upload-date");
+  const filesEl = $("log-upload-files");
+  const runQA = $("log-upload-qa").checked;
+  const btn = $("log-upload-btn");
+
+  const date = dateEl.value;
+  if (!date) { toast("Pick a date first", "error"); return; }
+  if (!filesEl.files || !filesEl.files.length) {
+    toast("Pick at least one .md or .txt file", "error");
+    return;
+  }
+
+  setBusy(btn, true, "Reading files...");
+  try {
+    const files = [];
+    for (const f of filesEl.files) {
+      const content = await f.text();
+      files.push({ name: f.name, content });
+    }
+    setBusy(btn, true, "Generating...");
+    const r = await api("/api/log/upload", { files, date, run_qa: runQA });
+    state.log.sessionId = r.session_id;
+    hide($("log-start"));
+    show($("log-chat"));
+    const thread = $("log-thread");
+    const summary = `Uploaded ${files.length} file(s) for ${date}:\n${files.map(f => "• " + f.name).join("\n")}`;
+    bubble(thread, "user", summary);
+    handleLogTurn(r, thread);
+  } catch (e) { toast(e.message, "error"); }
+  finally { setBusy(btn, false); }
+}
+
 async function logAnswer() {
   const ans = $("log-answer").value.trim();
   if (!ans) { toast("Empty answer", "error"); return; }
@@ -311,6 +344,64 @@ function resetLog() {
 
 $("log-start-btn").onclick = () => logStart(false);
 $("log-terse-btn").onclick = () => logStart(true);
+$("log-upload-btn").onclick = logUpload;
+
+// Default upload date to today; show DD-MM-YY hint under the picker.
+function fmtDDMMYY(isoDate) {
+  if (!isoDate) return "";
+  const [y, m, d] = isoDate.split("-");
+  return `${d}-${m}-${y.slice(2)}`;
+}
+function refreshUploadDateHint() {
+  const v = $("log-upload-date").value;
+  $("log-upload-date-pretty").textContent = v ? fmtDDMMYY(v) : "";
+}
+$("log-upload-date").value = new Date().toISOString().slice(0, 10);
+$("log-upload-date").addEventListener("change", refreshUploadDateHint);
+refreshUploadDateHint();
+
+// File-drop label: update text + visual state when files are selected.
+function refreshUploadFilesLabel() {
+  const files = $("log-upload-files").files;
+  const drop = $("log-upload-drop");
+  const text = $("log-upload-drop-text");
+  if (files && files.length) {
+    drop.classList.add("has-files");
+    const names = [...files].map(f => f.name).join(", ");
+    text.textContent = files.length === 1
+      ? names
+      : `${files.length} files: ${names}`;
+  } else {
+    drop.classList.remove("has-files");
+    text.textContent = "Click to select files, or drag & drop";
+  }
+}
+$("log-upload-files").addEventListener("change", refreshUploadFilesLabel);
+
+// Drag-and-drop onto the entire .file-drop label.
+(() => {
+  const drop = $("log-upload-drop");
+  if (!drop) return;
+  ["dragenter", "dragover"].forEach(ev => {
+    drop.addEventListener(ev, (e) => {
+      e.preventDefault();
+      drop.style.borderColor = "var(--accent)";
+    });
+  });
+  ["dragleave", "drop"].forEach(ev => {
+    drop.addEventListener(ev, (e) => {
+      e.preventDefault();
+      drop.style.borderColor = "";
+    });
+  });
+  drop.addEventListener("drop", (e) => {
+    const files = e.dataTransfer && e.dataTransfer.files;
+    if (files && files.length) {
+      $("log-upload-files").files = files;
+      refreshUploadFilesLabel();
+    }
+  });
+})();
 $("log-answer-btn").onclick = logAnswer;
 $("log-done-btn").onclick = logDone;
 $("log-save-btn").onclick = logSave;
