@@ -23,11 +23,36 @@
   <div id="today-status" class="status"></div>
 
   <div id="log-start" class="card">
-    <label>Brain dump <span class="hint">— what you worked on, blockers, anything. Or "nothing much today".</span></label>
+    <div class="card-section">Brain dump</div>
+    <label>What did you work on? <span class="hint">— anything goes. Or "nothing much today".</span></label>
     <textarea id="log-dump" rows="10" placeholder="I worked on..."></textarea>
     <div class="row">
       <button id="log-start-btn" class="primary">Start</button>
-      <button id="log-terse-btn" class="ghost" title="Skip the Q&amp;A — just structure what I wrote">Just save this, no questions</button>
+      <button id="log-terse-btn" class="ghost" title="Skip the Q&amp;A — just structure what I wrote">Save without questions</button>
+    </div>
+
+    <div class="card-divider"></div>
+
+    <div class="card-section">Upload reports</div>
+    <label>Pick a date and one or more <code>.md</code> / <code>.txt</code> files</label>
+    <div class="upload-row">
+      <div class="date-cell">
+        <input type="date" id="log-upload-date" />
+        <span class="date-pretty" id="log-upload-date-pretty"></span>
+      </div>
+      <label class="file-drop" id="log-upload-drop">
+        <span class="file-drop-icon">📄</span>
+        <span class="file-drop-text" id="log-upload-drop-text">Click to select files, or drag &amp; drop</span>
+        <input type="file" id="log-upload-files" accept=".md,.txt,text/markdown,text/plain" multiple />
+      </label>
+    </div>
+    <div class="row" style="margin-top: 14px;">
+      <label class="check">
+        <input type="checkbox" id="log-upload-qa" /> Ask follow-up questions before generating
+      </label>
+    </div>
+    <div class="row">
+      <button id="log-upload-btn" class="primary">Upload &amp; generate</button>
     </div>
   </div>
 
