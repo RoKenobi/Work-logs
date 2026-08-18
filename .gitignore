@@ -1,6 +1,1 @@
-.env
-__pycache__/
-.claude/
-.obsidian/
-config.local.yaml
-logbook/.obsidian/workspace.json
+logbook/
